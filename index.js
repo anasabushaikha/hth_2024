@@ -14,6 +14,28 @@ client.connect()
   .then(() => console.log('Connected to the database'))
   .catch(err => console.error('Connection error', err.stack));
 
+
+
+// Insert test data
+const insertTestEvents = async () => {
+    try {
+      await client.query(`
+        INSERT INTO events (event_title, event_day, event_time, location, description, reminder)
+        VALUES 
+          ('Team Meeting', '2024-09-30', '14:00:00', 'Conference Room A', 'Discuss project updates', '30 minutes'),
+          ('Lunch with Sarah', '2024-10-01', '12:30:00', 'Café', 'Catch up and discuss project.', '15 minutes');
+      `);
+      console.log('Test events inserted');
+    } catch (error) {
+      console.error('Error inserting events:', error);
+    } finally {
+      client.end();
+    }
+  };
+  
+  // Call the function to insert test data
+  insertTestEvents();
+
 // Example query
 client.query('SELECT * FROM events;', (err, res) => {
   if (err) {
