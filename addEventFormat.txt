@@ -1,0 +1,24 @@
+Fine tuning so that chatgpt/gemini will return whatever event said 
+by user will be in this format to be fed into the code to be added 
+onto the calendar
+
+
+Event Title:             input
+Day (YYYY-MM-DD):        input
+start Time (00:00 to 00:00):   input
+end Time (00:00 to 00:00):   input
+Location (string):       input
+Description (string):    input
+Reminder (time):         input
+
+
+CREATE TABLE events (
+    id SERIAL PRIMARY KEY,              -- Unique ID for each event
+    event_title VARCHAR(255) NOT NULL,  -- Event title input by the user
+    event_day DATE NOT NULL,            -- Date of the event in YYYY-MM-DD format
+    event_start_time TIME NOT NULL,           -- Time of the event (HH:MM:SS)
+    event_end_time TIME NOT NULL,           -- Time of the event (HH:MM:SS)
+    location VARCHAR(255),              -- Location of the event
+    description TEXT,                   -- Description of the event
+    reminder INTERVAL                  -- Time before the event to set a reminder
+);
