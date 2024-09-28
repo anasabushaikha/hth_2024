@@ -1,53 +1,68 @@
-import { create } from 'zustand'
-
-const generateId = () => Math.random().toString(36).substr(2, 9)
-
-const initialTasks = [
-  { id: generateId(), title: 'Weekend Brunch', duration: 90, startTime: '5:30', date: '2024-10-28' },
-  { id: generateId(), title: 'Grocery Shopping', duration: 300, startTime: '06:00', date: '2024-09-28' },
-  { id: generateId(), title: 'Movie Night', duration: 120, startTime:'1:00', date: '2024-09-27' },
-  { id: generateId(), title: 'Morning Jog', duration: 45, startTime: '07:00', date: '2024-09-29' },
-  { id: generateId(), title: 'Family Lunch', duration: 120, startTime: '13:00', date: '2024-09-29' },
-  { id: generateId(), title: 'Book Club Meeting', duration: 90, startTime: '18:30', date: '2024-09-29' },
-  { id: generateId(), title: 'Team Standup', duration: 30, startTime: '09:00', date: '2024-09-30' },
-  { id: generateId(), title: 'Project Presentation', duration: 60, startTime: '14:00', date: '2024-09-30' },
-  { id: generateId(), title: 'Yoga Class', duration: 75, startTime: '18:00', date: '2024-09-30' },
-  { id: generateId(), title: 'Dentist Appointment', duration: 60, startTime: '11:00', date: '2024-10-01' },
-  { id: generateId(), title: 'Lunch with Client', duration: 90, startTime: '13:30', date: '2024-10-01' },
-  { id: generateId(), title: 'Evening Webinar', duration: 120, startTime: '19:00', date: '2024-10-01' },
-  { id: generateId(), title: 'Gym Session', duration: 60, startTime: '07:30', date: '2024-10-02' },
-  { id: generateId(), title: 'Team Building Activity', duration: 180, startTime: '13:00', date: '2024-10-02' },
-  { id: generateId(), title: 'Online Course', duration: 90, startTime: '20:00', date: '2024-10-02' },
-  { id: generateId(), title: 'Quarterly Review', duration: 120, startTime: '10:00', date: '2024-10-03' },
-  { id: generateId(), title: 'Lunch Break', duration: 60, startTime: '13:00', date: '2024-10-03' },
-  { id: generateId(), title: 'Happy Hour with Colleagues', duration: 120, startTime: '18:00', date: '2024-10-03' },
-  { id: generateId(), title: 'Morning Meditation', duration: 30, startTime: '07:00', date: '2024-10-04' },
-  { id: generateId(), title: 'Project Deadline', duration: 240, startTime: '09:00', date: '2024-10-04' },
-  { id: generateId(), title: 'Farewell Party', duration: 180, startTime: '18:00', date: '2024-10-04' }
-]
-
-const useTaskStore = create((set) => ({
-  tasks: initialTasks,
+ 
+import { create } from 'zustand';
+import { useEffect } from 'react';
+import axios from 'axios';
+ 
+const generateId = () => Math.random().toString(36).substr(2, 9);
+ 
+export const useTaskStore = create((set) => ({
+  tasks: [],
   setTasks: (tasks) => set({ tasks }),
   addTask: (newTask) => {
-    const taskWithId = { ...newTask, id: generateId() }
+    const taskWithId = { ...newTask, id: generateId() };
     set((state) => ({
       tasks: [...state.tasks, taskWithId],
-    }))
-    return { success: true, message: 'Task added successfully' }
+    }));
+    return { success: true, message: 'Task added successfully' };
   },
   deleteTask: (taskId) => {
     set((state) => ({
       tasks: state.tasks.filter((task) => task.id !== taskId),
-    }))
-    return { success: true, message: 'Task deleted successfully' }
+    }));
+    return { success: true, message: 'Task deleted successfully' };
   },
   updateTask: (taskId, updatedTask) => {
     set((state) => ({
-      tasks: state.tasks.map((task) => (task.id === taskId ? { ...task, ...updatedTask } : task)),
-    }))
-    return { success: true, message: 'Task updated successfully' }
+      tasks: state.tasks.map((task) =>
+        task.id === taskId ? { ...task, ...updatedTask } : task
+      ),
+    }));
+    return { success: true, message: 'Task updated successfully' };
   },
-}))
+}));
+ 
+// Custom hook to fetch tasks from the server
+export const useFetchTasks = () => {
+  const { tasks, setTasks } = useTaskStore();
+ 
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/getEvents');
+       
+        const fetchedEvents = response.data.map((event) => ({
+          id: generateId(),  // Generate a new ID for each event
+          title: event.event_title,
+          duration: event.end_time - event.start_time,  // Assuming you need to calculate duration
+          startTime: event.start_time,
+          date: event.event_day,
+        }));
+        console.log(fetchedEvents)
+        setTasks(fetchedEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+ 
+    fetchTasks();
+  }, [setTasks]);
 
-export default useTaskStore
+  return tasks
+};
+ 
+//export default useTaskStore;
+// export {useFetchTasks} ;
+ 
+ 
+ 
+ 

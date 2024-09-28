@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react'
-import useTaskStore from '../store/product'
+import {useTaskStore, useFetchTasks} from '../store/product'
 import './Timetable.css'
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -109,6 +109,10 @@ const TaskModal = ({ task, onClose, onDelete }) => {
 const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
   const { tasks, deleteTask, updateTask } = useTaskStore()
   const [selectedTask, setSelectedTask] = useState(null)
+
+  // TODO: use state & use effect
+  const x = useFetchTasks()
+  console.log('x', x)
 
   const visibleDates = useMemo(() => {
     const dates = []
