@@ -1,3 +1,6 @@
+ 
+ 
+ 
 import React, { useState, useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import Navbar from './components/Navbar';
@@ -5,19 +8,19 @@ import Timetable from './components/Timetable';
 import AddTaskForm from './components/AddTaskForm';
 import './App.css';
 import useTaskStore, { useFetchTasks } from './product';  // Import task store and fetch hook
-
+ 
 function App() {
   const [currentDate, setCurrentDate] = useState(() => {
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     return today;
   });
-
+ 
   // Fetch tasks from server when the app loads
   useFetchTasks();  // This will populate the tasks from the server
-
+ 
   const tasks = useTaskStore((state) => state.tasks);  // Get tasks from the Zustand store
-
+ 
   const goToPreviousWeek = () => {
     setCurrentDate(prevDate => {
       const newDate = new Date(prevDate);
@@ -25,7 +28,7 @@ function App() {
       return newDate;
     });
   };
-
+ 
   const goToNextWeek = () => {
     setCurrentDate(prevDate => {
       const newDate = new Date(prevDate);
@@ -33,7 +36,7 @@ function App() {
       return newDate;
     });
   };
-
+ 
   return (
     <div className="app">
       <Navbar />
@@ -60,5 +63,7 @@ function App() {
     </div>
   );
 }
-
+ 
 export default App;
+ 
+ 

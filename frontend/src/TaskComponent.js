@@ -1,10 +1,13 @@
+ 
+ 
+ 
 import React from 'react';
 import useTaskStore, { useFetchTasks } from './product';  // Import store and hook
-
+ 
 const TaskComponent = () => {
   const tasks = useTaskStore((state) => state.tasks);  // Access tasks from Zustand
   useFetchTasks();  // Fetch tasks from the server when the component mounts
-
+ 
   return (
     <div>
       <h1>Task List</h1>
@@ -18,5 +21,7 @@ const TaskComponent = () => {
     </div>
   );
 };
-
+ 
 export default TaskComponent;
+ 
+ 

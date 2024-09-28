@@ -1,9 +1,10 @@
+ 
 import { create } from 'zustand';
 import { useEffect } from 'react';
 import axios from 'axios';
-
+ 
 const generateId = () => Math.random().toString(36).substr(2, 9);
-
+ 
 const useTaskStore = create((set) => ({
   tasks: [],
   setTasks: (tasks) => set({ tasks }),
@@ -29,16 +30,16 @@ const useTaskStore = create((set) => ({
     return { success: true, message: 'Task updated successfully' };
   },
 }));
-
+ 
 // Custom hook to fetch tasks from the server
 export const useFetchTasks = () => {
   const { setTasks } = useTaskStore();
-
+ 
   useEffect(() => {
     const fetchTasks = async () => {
       try {
         const response = await axios.get('http://localhost:3000/getEvents');
-        
+       
         const fetchedEvents = response.data.map((event) => ({
           id: generateId(),  // Generate a new ID for each event
           title: event.event_title,
@@ -52,9 +53,13 @@ export const useFetchTasks = () => {
         console.error('Error fetching events:', error);
       }
     };
-
+ 
     fetchTasks();
   }, [setTasks]);
 };
-
+ 
 export default useTaskStore;
+ 
+ 
+ 
+ 
