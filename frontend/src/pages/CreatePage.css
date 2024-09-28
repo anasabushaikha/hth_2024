@@ -1,0 +1,82 @@
+.create-page {
+  min-height: calc(100vh - 64px); /* Adjust based on your navbar height */
+  background: #f7fafc;
+  padding: 2rem;
+}
+
+.create-grid {
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.form-section,
+.preview-section {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.page-title {
+  color: #2d3748;
+  margin-bottom: 1.5rem;
+}
+
+.preview-card {
+  display: flex;
+  flex-direction: column;
+  background: #f1f5f9;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.preview-image {
+  width: 100%;
+  height: 300px;
+  object-fit: cover;
+}
+
+.preview-details {
+  padding: 1.5rem;
+}
+
+/* Dark mode styles */
+[data-theme="dark"] .create-page {
+  background: #1a202c;
+}
+
+[data-theme="dark"] .form-section,
+[data-theme="dark"] .preview-section {
+  background: #2d3748;
+}
+
+[data-theme="dark"] .page-title {
+  color: #e2e8f0;
+}
+
+[data-theme="dark"] .preview-card {
+  background: #4a5568;
+}
+
+/* Responsive adjustments */
+@media (max-width: 991px) {
+  .create-page {
+    padding: 1rem;
+  }
+
+  .form-section,
+  .preview-section {
+    padding: 1.5rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .create-page {
+    padding: 0.5rem;
+  }
+
+  .form-section,
+  .preview-section {
+    padding: 1rem;
+  }
+}
