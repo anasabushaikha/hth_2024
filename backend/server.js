@@ -2,8 +2,6 @@ import express from 'express';
 import pkg from 'pg';  // Import pg as a package
 import cors from 'cors';  // Import cors
 import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
 import { pipeline } from 'stream';  // Import stream pipeline to handle audio streaming
 
 // Destructure Client from the pg package
@@ -16,30 +14,6 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-app.get('/getEvents', async (req, res) => {
-    console.log("get test")
-    const client = new Client({
-      user: 'postgres',
-      host: 'localhost',
-      database: 'hth-project',
-      password: 'postgres',
-      port: 5432,
-    });
-  
-    try {
-      await client.connect();
-      const query = 'SELECT * FROM events;';
-      const result = await client.query(query);
-      res.json(result.rows); // Send the rows as JSON
-    } catch (err) {
-      console.error('Error fetching events:', err);
-      res.status(500).json({ success: false, message: 'Error fetching events' });
-    } finally {
-      await client.end();
-    }
-  });
-
-
 // PostgreSQL client configuration
 const clientConfig = {
   user: 'postgres',
@@ -49,40 +23,74 @@ const clientConfig = {
   port: 5432,
 };
 
-// Endpoint to handle event insertion
-app.post('/insertEvents', async (req, res) => {
+// Endpoint to handle event and habit insertion
+app.post('/insertEventsAndHabits', async (req, res) => {
   const events = req.body.events;
+  const habits = req.body.habits; // Assume habits are sent in the same request
 
   const client = new Client(clientConfig);
 
   try {
     await client.connect();
 
+    // Insert events into schedule_events table
     for (let event of events) {
       const query = `
-        INSERT INTO events (event_title, event_day, start_time, end_time, location, description, reminder)
-        VALUES ($1, $2, $3, $4, $5, $6, $7);
+        INSERT INTO schedule_events (title, event_date, start_time, end_time, location, description, reminder, duration, focus, moveable)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
       `;
       const values = [
-        event["Event Title"],
-        event["Day"],
-        event["StartTime"],
-        event["EndTime"],
-        event["Location"],
-        event["Description"],
-        event["Reminder"]
+        event["title"],
+        event["date"],
+        event["starttime"],
+        event["endtime"],
+        event["location"] || 'None', // Default to 'None' if location is empty
+        event["description"],
+        event["reminder"] || 5, // Default reminder to 5 if not specified
+        event["duration"],
+        event["focus"],
+        event["moveable"]
       ];
 
       await client.query(query, values);
-      console.log(`Inserted event: ${event["Event Title"]}`);
+      console.log(`Inserted event: ${event["title"]}`);
     }
 
-    // After successfully inserting, generate speech
-    const message = 'You sexy beast! Events have been inserted successfully! Good job, sweetheart!';
-    res.json({ success: true });
+    // Insert habits into user_habits table
+    if (habits && habits.length > 0) {
+      for (let habit of habits) {
+        const habitQuery = `
+          INSERT INTO user_habits (habit)
+          VALUES ($1);
+        `;
+        await client.query(habitQuery, [habit]);
+        console.log(`Inserted habit: ${habit}`);
+      }
+    }
+
+    // After successfully inserting, generate a message
+    const message = 'Events and habits have been inserted successfully!';
+    res.json({ success: true, message });
   } catch (err) {
-    console.error('Error inserting events:', err);
-    res.status(500).json({ success: false, message: 'Error inserting events' });
+    console.error('Error inserting events or habits:', err);
+    res.status(500).json({ success: false, message: 'Error inserting events or habits' });
+  } finally {
+    await client.end();
+  }
+});
+
+// Endpoint to fetch events
+app.get('/getEvents', async (req, res) => {
+  const client = new Client(clientConfig);
+
+  try {
+    await client.connect();
+    const query = 'SELECT * FROM events;';
+    const result = await client.query(query);
+    res.json(result.rows); // Send the rows as JSON
+  } catch (err) {
+    console.error('Error fetching events:', err);
+    res.status(500).json({ success: false, message: 'Error fetching events' });
   } finally {
     await client.end();
   }
@@ -90,7 +98,7 @@ app.post('/insertEvents', async (req, res) => {
 
 // Endpoint to generate speech using OpenAI's TTS
 app.post('/generateSpeech', async (req, res) => {
-  const { message } = req.body;
+  const { message, voice = 'shimmer', pitch = -2, speed = 0.9 } = req.body; // Default values for pitch and speed
 
   try {
     // Call the OpenAI API to generate speech
@@ -103,8 +111,12 @@ app.post('/generateSpeech', async (req, res) => {
       },
       data: {
         model: 'tts-1',
-        voice: 'alloy',
-        input: message
+        voice, // Default voice 'shimmer'
+        input: message,
+        options: {
+          pitch, // Use the provided pitch
+          speed  // Use the provided speed
+        }
       },
       responseType: 'stream'
     });
