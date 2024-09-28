@@ -1,0 +1,57 @@
+.task-item {
+  transition: all 0.3s ease;
+}
+
+.task-item.deleting {
+  animation: shatter 0.5s ease-out forwards;
+}
+
+@keyframes shatter {
+  0% {
+    transform: scale(1);
+    opacity: 1;
+  }
+  20% {
+    transform: scale(1.1) rotate(5deg);
+  }
+  40% {
+    transform: scale(0.9) rotate(-5deg);
+  }
+  60% {
+    transform: scale(1.05) rotate(3deg);
+  }
+  80% {
+    transform: scale(0.95) rotate(-3deg);
+  }
+  100% {
+    transform: scale(0) rotate(10deg);
+    opacity: 0;
+  }
+}
+
+.delete-button {
+  position: absolute;
+  top: 5px;
+  right: 5px;
+  background-color: #ff5a5f;
+  color: white;
+  border: none;
+  padding: 2px 5px;
+  font-size: 0.8em;
+  border-radius: 3px;
+  cursor: pointer;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.task-item:hover .delete-button {
+  opacity: 1;
+}
+
+.timetable {
+  min-height: 400px; /* Adjust this value as needed */
+}
+
+.timetable-grid {
+  min-height: 100%;
+}

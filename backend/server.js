@@ -1,7 +1,6 @@
 import express from 'express';
 import { connectDB } from './config/db.js';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
 import productRoutes from './routes/product.route.js';
 import cors from 'cors';  // Add this line
 dotenv.config()
@@ -12,7 +11,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors()); 
 app.use(express.json());
 
-app.use('/api/products', productRoutes);
+app.use('/', productRoutes);
         
 app.listen(PORT, () => {
     connectDB()

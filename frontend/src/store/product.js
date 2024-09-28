@@ -3,9 +3,9 @@ import { create } from 'zustand'
 const generateId = () => Math.random().toString(36).substr(2, 9)
 
 const initialTasks = [
-  { id: generateId(), title: 'Weekend Brunch', duration: 90, startTime: '10:30', date: '2024-09-28' },
-  { id: generateId(), title: 'Grocery Shopping', duration: 60, startTime: '14:00', date: '2024-09-28' },
-  { id: generateId(), title: 'Movie Night', duration: 120, startTime: '20:00', date: '2024-09-28' },
+  { id: generateId(), title: 'Weekend Brunch', duration: 90, startTime: '5:30', date: '2024-10-28' },
+  { id: generateId(), title: 'Grocery Shopping', duration: 300, startTime: '06:00', date: '2024-09-28' },
+  { id: generateId(), title: 'Movie Night', duration: 120, startTime:'1:00', date: '2024-09-27' },
   { id: generateId(), title: 'Morning Jog', duration: 45, startTime: '07:00', date: '2024-09-29' },
   { id: generateId(), title: 'Family Lunch', duration: 120, startTime: '13:00', date: '2024-09-29' },
   { id: generateId(), title: 'Book Club Meeting', duration: 90, startTime: '18:30', date: '2024-09-29' },
