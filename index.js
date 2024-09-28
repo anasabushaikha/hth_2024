@@ -1,4 +1,5 @@
-const { Client } = require('pg');
+const { Client } = import('pg');
+
 
 // Set up client details
 const client = new Client({
@@ -14,6 +15,7 @@ client.connect()
   .then(() => console.log('Connected to the database'))
   .catch(err => console.error('Connection error', err.stack));
 
+
 // Insert test data
 const insertTestEvents = async () => {
   try {
@@ -26,6 +28,18 @@ const insertTestEvents = async () => {
     console.log('Test events inserted');
   } catch (error) {
     console.error('Error inserting events:', error);
+  }
+};
+
+// GET endpoint to retrieve all events
+const getTasks = async () => {
+  try {
+    const result = await pool.query('SELECT * FROM events ORDER BY event_day, event_start_time');
+    console.log('Query result:', result.rows);
+    res.json(result.rows);
+  } catch (err) {
+    console.error('Error executing query', err.stack);
+    res.status(500).json({ error: 'An error occurred while fetching tasks' });
   }
 };
 
@@ -48,3 +62,30 @@ const runDatabaseOperations = async () => {
 };
 
 runDatabaseOperations();
+
+
+// Function to fetch events and set reminders
+const setReminders = async () => {
+  try {
+    const res = await client.query('SELECT * FROM events;');
+    const events = res.rows;
+
+    events.forEach(event => {
+      const endTime = new Date(`${event.event_day}T${event.event_end_time}`);
+      const reminderTime = new Date(endTime.getTime() - 15 * 60 * 1000); // 15 minutes before end time
+
+      const now = new Date();
+      const timeUntilReminder = reminderTime - now;
+
+      if (timeUntilReminder > 0) {
+        setTimeout(() => {
+          chrome.runtime.sendMessage({ action: 'showReminder', event });
+        }, timeUntilReminder);
+      }
+    });
+  } catch (error) {
+    console.error('Error fetching events:', error);
+  }
+};
+
+setReminders();
