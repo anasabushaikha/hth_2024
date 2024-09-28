@@ -1,6 +1,6 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import useTaskStore from '../store/product'
+import useTaskStore from '../product'
 
 const AddTaskForm = () => {
   const [title, setTitle] = useState('')

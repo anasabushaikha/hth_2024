@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect } from 'react'
-import useTaskStore from '../store/product'
+import useTaskStore from '../product'
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 

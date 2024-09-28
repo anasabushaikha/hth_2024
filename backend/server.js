@@ -16,6 +16,7 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
+<<<<<<< Updated upstream
 // PostgreSQL client configuration
 const clientConfig = {
   user: 'postgres',
@@ -64,6 +65,84 @@ app.post('/insertEvents', async (req, res) => {
   }
 });
 
+=======
+app.get('/getEvents', async (req, res) => {
+    const client = new Client({
+      user: 'postgres',
+      host: 'localhost',
+      database: 'hth-project',
+      password: 'postgres',
+      port: 5432,
+    });
+
+    try {
+      await client.connect();
+      const query = 'SELECT * FROM events;';
+      const result = await client.query(query);
+      
+      // Log the results to the terminal
+      console.log('Fetched events:', result.rows);
+
+      // Don't send a response to the client for testing
+      res.json(result.rows); 
+    } catch (err) {
+      console.error('Error fetching events:', err);
+      res.status(500).json({ success: false, message: 'Error fetching events' });
+    } finally {
+      await client.end();
+    }
+});
+
+
+// PostgreSQL client configuration
+const clientConfig = {
+  user: 'postgres',
+  host: 'localhost',
+  database: 'hth-project',
+  password: 'postgres',
+  port: 5432,
+};
+
+// Endpoint to handle event insertion
+app.post('/insertEvents', async (req, res) => {
+  const events = req.body.events;
+
+  const client = new Client(clientConfig);
+
+  try {
+    await client.connect();
+
+    for (let event of events) {
+      const query = `
+        INSERT INTO events (event_title, event_day, start_time, end_time, location, description, reminder)
+        VALUES ($1, $2, $3, $4, $5, $6, $7);
+      `;
+      const values = [
+        event["Event Title"],
+        event["Day"],
+        event["StartTime"],
+        event["EndTime"],
+        event["Location"],
+        event["Description"],
+        event["Reminder"]
+      ];
+
+      await client.query(query, values);
+      console.log(`Inserted event: ${event["Event Title"]}`);
+    }
+
+    // After successfully inserting, generate speech
+    const message = 'You sexy beast! Events have been inserted successfully! Good job, sweetheart!';
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error inserting events:', err);
+    res.status(500).json({ success: false, message: 'Error inserting events' });
+  } finally {
+    await client.end();
+  }
+});
+
+>>>>>>> Stashed changes
 // Endpoint to generate speech using OpenAI's TTS
 app.post('/generateSpeech', async (req, res) => {
   const { message } = req.body;
