@@ -51,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
           'Authorization': 'Bearer ' + apiKey
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4o',
           messages: [
             {
               role: 'system',
@@ -83,13 +83,17 @@ document.addEventListener('DOMContentLoaded', function() {
               const jsonResponse = aiResponse.substring(jsonStart, jsonEnd);
               const events = JSON.parse(jsonResponse);  // Parse the JSON response
 
-              output.textContent = 'Event Suggestions: ' + JSON.stringify(events, null, 2);
+              output.textContent = JSON.stringify(events, null, 2);
+              
+              insertEventsIntoDatabase(events);
             } else {
               throw new Error('No JSON found in the response');
             }
           } catch (error) {
             console.error('JSON Parse Error:', error);
-            output.textContent = 'Error parsing JSON response. Please check the response format.';
+            // output.textContent = 'Error parsing JSON response. Please check the response format.';
+            // setTimeout(2000)
+            output.textContent = error
           }
         }
       })
@@ -102,4 +106,27 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
+
+  function insertEventsIntoDatabase(events) {
+    fetch('http://localhost:3000/insertEvents', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ events }),  // Send the events data to the backend
+    })
+    .then(response => response.json())
+    .then(data => {
+      if (data.success) {
+        output.textContent = 'Events inserted successfully!';
+      } else {
+        output.textContent = 'Error inserting events: ' + data.message;
+      }
+    })
+    .catch(error => {
+      console.error('Error inserting events:', error);
+      output.textContent = error;
+    });
+  }
+  
 });
