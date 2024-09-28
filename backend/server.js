@@ -2,8 +2,6 @@ import express from 'express';
 import pkg from 'pg';  // Import pg as a package
 import cors from 'cors';  // Import cors
 import axios from 'axios';
-import fs from 'fs';
-import path from 'path';
 import { pipeline } from 'stream';  // Import stream pipeline to handle audio streaming
 
 // Destructure Client from the pg package
@@ -25,7 +23,7 @@ const clientConfig = {
   port: 5432,
 };
 
-// Endpoint to handle event insertion
+// Endpoint to handle event and habit insertion
 app.post('/insertEventsAndHabits', async (req, res) => {
   const events = req.body.events;
   const habits = req.body.habits; // Assume habits are sent in the same request
@@ -70,8 +68,9 @@ app.post('/insertEventsAndHabits', async (req, res) => {
       }
     }
 
-    // After successfully inserting, respond with success
-    res.json({ success: true });
+    // After successfully inserting, generate a message
+    const message = 'Events and habits have been inserted successfully!';
+    res.json({ success: true, message });
   } catch (err) {
     console.error('Error inserting events or habits:', err);
     res.status(500).json({ success: false, message: 'Error inserting events or habits' });
@@ -80,10 +79,26 @@ app.post('/insertEventsAndHabits', async (req, res) => {
   }
 });
 
+// Endpoint to fetch events
+app.get('/getEvents', async (req, res) => {
+  const client = new Client(clientConfig);
+
+  try {
+    await client.connect();
+    const query = 'SELECT * FROM events;';
+    const result = await client.query(query);
+    res.json(result.rows); // Send the rows as JSON
+  } catch (err) {
+    console.error('Error fetching events:', err);
+    res.status(500).json({ success: false, message: 'Error fetching events' });
+  } finally {
+    await client.end();
+  }
+});
 
 // Endpoint to generate speech using OpenAI's TTS
 app.post('/generateSpeech', async (req, res) => {
-  const { message } = req.body;
+  const { message, voice = 'shimmer', pitch = -2, speed = 0.9 } = req.body; // Default values for pitch and speed
 
   try {
     // Call the OpenAI API to generate speech
@@ -95,15 +110,14 @@ app.post('/generateSpeech', async (req, res) => {
         'Content-Type': 'application/json'
       },
       data: {
-        model: 'tts-1', // or 'tts-1-hd' for higher quality
-        voice: 'shimmer', // try Shimmer for a soft and soothing tone
+        model: 'tts-1',
+        voice, // Default voice 'shimmer'
         input: message,
         options: {
-          pitch: -2, // lower pitch slightly for a more soothing sound
-          speed: 0.9 // reduce speed for a calming effect
+          pitch, // Use the provided pitch
+          speed  // Use the provided speed
         }
       },
-      
       responseType: 'stream'
     });
 
@@ -127,5 +141,3 @@ app.post('/generateSpeech', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
-
-
