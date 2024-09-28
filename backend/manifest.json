@@ -11,16 +11,8 @@
         "js": ["content.js"]
       }
     ],
-    "content_scripts": [
-      {
-        "matches": ["<all_urls>"],
-        "js": ["content.js"]
-      }
-    ],
     "options_page": "options.html",
     "action": {
-      "default_popup": "popup.html",
-      "default_title": "Voice Task Manager with AI"      
       "default_popup": "popup.html",
       "default_title": "Voice Task Manager with AI"      
     },
@@ -38,10 +30,10 @@
       "alarms"
     ],
     "host_permissions": [
-      "://.youtube.com/*",
-      "https://api.openai.com/*",
-      "://.facebook.com/*",
-      "://.netflix.com/*",
-      "://.instagram.com/*"
+    "*://*.youtube.com/*",
+    "*://*.facebook.com/*",
+    "*://*.netflix.com/*",
+    "*://*.instagram.com/*",
+    "https://api.openai.com/*"
     ]
 }

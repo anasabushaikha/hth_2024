@@ -277,4 +277,3 @@ document.addEventListener('DOMContentLoaded', function() {
 
   // Call the function when the popup is opened
   document.addEventListener('DOMContentLoaded', fetchAndDisplayTasks);
-});
