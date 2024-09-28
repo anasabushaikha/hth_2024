@@ -1,9 +1,10 @@
 document.addEventListener('DOMContentLoaded', function() {
-  const startButton = document.getElementById('startListening');
   const output = document.getElementById('output');
   let recognition;
+  let wakeWordRecognition;
 
-  startButton.addEventListener('click', function() {
+  // Function to start the main recognition process
+  function startMainRecognition() {
     if ('webkitSpeechRecognition' in window) {
       recognition = new webkitSpeechRecognition();
       recognition.continuous = false;
@@ -26,21 +27,60 @@ document.addEventListener('DOMContentLoaded', function() {
         output.textContent = 'Error occurred in recognition: ' + event.error;
       };
 
+      recognition.onend = function() {
+        // Restart the wake word recognition after the main recognition ends
+        startWakeWordRecognition();
+      };
+
       recognition.start();
     } else {
       output.textContent = 'Web Speech API is not supported in this browser.';
     }
-  });
+  }
+
+  // Function to start listening for the wake word "Hey Mommy"
+  function startWakeWordRecognition() {
+    if ('webkitSpeechRecognition' in window) {
+      wakeWordRecognition = new webkitSpeechRecognition();
+      wakeWordRecognition.continuous = true;
+      wakeWordRecognition.interimResults = false;
+      wakeWordRecognition.lang = 'en-US';
+
+      wakeWordRecognition.onstart = function() {
+        output.textContent = 'Listening for wake word...';
+      };
+
+      wakeWordRecognition.onresult = function(event) {
+        const wakeWord = event.results[0][0].transcript.trim().toLowerCase();
+
+        if (wakeWord === 'hey mommy') {
+          output.textContent = 'Wake word detected: "Hey Mommy"';
+
+          // Stop wake word recognition and start the main recognition
+          wakeWordRecognition.stop();
+          startMainRecognition();
+        }
+      };
+
+      wakeWordRecognition.onerror = function(event) {
+        output.textContent = 'Error occurred in wake word recognition: ' + event.error;
+      };
+
+      wakeWordRecognition.start();
+    } else {
+      output.textContent = 'Web Speech API is not supported in this browser.';
+    }
+  }
+
+  // Call this function initially to start listening for the wake word
+  startWakeWordRecognition();
 
   function processCommand(command) {
-    startButton.disabled = true;
-
     chrome.storage.local.get(['openaiApiKey'], function(result) {
       const apiKey = result.openaiApiKey;
       if (!apiKey) {
         alert('Please set your OpenAI API key in the extension options.');
         output.textContent = 'API key not set.';
-        startButton.disabled = false;
         return;
       }
 
@@ -73,7 +113,7 @@ document.addEventListener('DOMContentLoaded', function() {
           output.textContent = 'Error processing the command.';
         } else {
           const aiResponse = data.choices[0].message.content.trim();
-          
+
           // Try to sanitize and parse the response to ensure valid JSON
           try {
             const jsonStart = aiResponse.indexOf('[');
@@ -91,18 +131,13 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           } catch (error) {
             console.error('JSON Parse Error:', error);
-            // output.textContent = 'Error parsing JSON response. Please check the response format.';
-            // setTimeout(2000)
-            output.textContent = error
+            output.textContent = 'Error parsing JSON response.';
           }
         }
       })
       .catch(error => {
         console.error('Fetch Error:', error);
         output.textContent = 'Error communicating with the AI service.';
-      })
-      .finally(() => {
-        startButton.disabled = false;
       });
     });
   }
@@ -118,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
         event["Day"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
       }
     });
-  
+
     fetch('http://localhost:3000/insertEvents', {
       method: 'POST',
       headers: {
@@ -139,7 +174,4 @@ document.addEventListener('DOMContentLoaded', function() {
       output.textContent = 'Error inserting events.';
     });
   }
-  
-  
-  
 });
