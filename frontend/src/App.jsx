@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Timetable from './components/Timetable'
 import AddTaskForm from './components/AddTaskForm'
+import BlockWebsite from './components/BlockWebsite'
 import './App.css'
 
 function App() {
@@ -35,16 +36,15 @@ function App() {
         <Routes>
           <Route path="/" element={
             <div className="timetable-container">
-              <button className="nav-button prev" onClick={goToPreviousWeek}>
-                <span className="arrow-icon">&gt;</span>
-              </button>
-              <Timetable currentDate={currentDate} />
-              <button className="nav-button next" onClick={goToNextWeek}>
-                <span className="arrow-icon">&gt;</span>
-              </button>
+              <Timetable 
+                currentDate={currentDate} 
+                goToPreviousWeek={goToPreviousWeek}
+                goToNextWeek={goToNextWeek}
+              />
             </div>
           } />
           <Route path="/add-task" element={<AddTaskForm />} />
+          <Route path="/block-website" element={<BlockWebsite />} />
         </Routes>
       </div>
     </div>

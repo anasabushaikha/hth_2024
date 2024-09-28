@@ -1,9 +1,11 @@
-import React, { useState, useMemo, useEffect } from 'react'
+import React, { useState, useMemo } from 'react'
 import useTaskStore from '../store/product'
+import './Timetable.css'
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
 
-const TaskItem = ({ task, onDelete, onMove, timeRange, onClick }) => {
+const TaskItem = ({ task, onDelete, onMove, timeRange, onClick, hourHeight }) => {
+  const [isDeleting, setIsDeleting] = useState(false);
   const colors = ['#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFD1DC']
   const bgColor = colors[Math.floor(Math.random() * colors.length)]
 
@@ -23,12 +25,18 @@ const TaskItem = ({ task, onDelete, onMove, timeRange, onClick }) => {
   const minHeight = 24 // Minimum height to display the title
   const isShortTask = taskHeight * 60 < minHeight * 2 // Check if task is too short to display all info
 
+  const handleDelete = (e) => {
+    e.stopPropagation(); // Prevent opening the task modal
+    setIsDeleting(true);
+    setTimeout(() => onDelete(task.id), 500); // Wait for animation to finish
+  };
+
   return (
     <div
-      className={`task-item ${isShortTask ? 'short-task' : ''}`}
+      className={`task-item ${isShortTask ? 'short-task' : ''} ${isDeleting ? 'deleting' : ''}`}
       style={{
-        top: `${taskStart * 60 + 60}px`, // Add 60px to account for the day header
-        height: `${Math.max(taskHeight * 60, minHeight)}px`,
+        top: `${taskStart * hourHeight + 60}px`, // Add 60px to account for the day header
+        height: `${Math.max(taskHeight * hourHeight, minHeight)}px`,
         borderLeftColor: bgColor,
       }}
       draggable
@@ -44,6 +52,7 @@ const TaskItem = ({ task, onDelete, onMove, timeRange, onClick }) => {
           <div className="task-duration">{task.duration} min</div>
         </>
       )}
+      <button className="delete-button" onClick={handleDelete}>Delete</button>
     </div>
   )
 }
@@ -97,32 +106,11 @@ const TaskModal = ({ task, onClose, onDelete }) => {
   )
 }
 
-const Timetable = ({ currentDate }) => {
+const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
   const { tasks, deleteTask, updateTask } = useTaskStore()
-  const [visibleDays, setVisibleDays] = useState(7)
   const [selectedTask, setSelectedTask] = useState(null)
 
-  useEffect(() => {
-    const handleResize = () => {
-      if (window.innerWidth < 768) {
-        setVisibleDays(3)
-      } else if (window.innerWidth < 1024) {
-        setVisibleDays(5)
-      } else {
-        setVisibleDays(7)
-      }
-    }
-
-    handleResize()
-    window.addEventListener('resize', handleResize)
-    return () => window.removeEventListener('resize', handleResize)
-  }, [])
-
-  const sortedTasks = useMemo(() => {
-    return [...tasks].sort((a, b) => new Date(a.date) - new Date(b.date))
-  }, [tasks])
-
-  const weekDates = useMemo(() => {
+  const visibleDates = useMemo(() => {
     const dates = []
     for (let i = 0; i < 7; i++) {
       const date = new Date(currentDate)
@@ -133,9 +121,20 @@ const Timetable = ({ currentDate }) => {
   }, [currentDate])
 
   const timeRange = useMemo(() => {
-    let earliestTime = 23 * 60 // Convert to minutes
+    const yesterday = new Date(visibleDates[0])
+    yesterday.setDate(yesterday.getDate() - 1)
+    const lastDay = new Date(visibleDates[6])
+    
+    const relevantTasks = tasks.filter(task => {
+      const taskDate = new Date(task.date)
+      return taskDate >= yesterday && taskDate <= lastDay
+    })
+
+    if (relevantTasks.length === 0) return { start: 0, end: 24 }
+
+    let earliestTime = 24 * 60 // Convert to minutes
     let latestTime = 0
-    tasks.forEach(task => {
+    relevantTasks.forEach(task => {
       const [hours, minutes] = task.startTime.split(':').map(Number)
       const taskStartMinutes = hours * 60 + minutes
       const taskEndMinutes = taskStartMinutes + task.duration
@@ -143,11 +142,16 @@ const Timetable = ({ currentDate }) => {
       earliestTime = Math.min(earliestTime, taskStartMinutes)
       latestTime = Math.max(latestTime, taskEndMinutes)
     })
+
+    // Ensure a minimum range of 6 hours and round to the nearest hour
+    const minRange = 6 * 60 // 6 hours in minutes
+    const rangeInMinutes = Math.max(latestTime - earliestTime, minRange)
+    
     return {
-      start: Math.floor(earliestTime / 60),
-      end: Math.ceil(latestTime / 60)
+      start: Math.max(0, Math.floor(earliestTime / 60) - 1),
+      end: Math.min(24, Math.ceil((earliestTime + rangeInMinutes) / 60) + 1)
     }
-  }, [tasks])
+  }, [tasks, visibleDates])
 
   const timeSlots = useMemo(() => {
     return Array.from(
@@ -156,15 +160,9 @@ const Timetable = ({ currentDate }) => {
     )
   }, [timeRange])
 
-  const visibleWeekDates = useMemo(() => {
-    return weekDates.slice(0, visibleDays)
-  }, [weekDates, visibleDays])
-
   const handleDelete = (taskId) => {
-    if (window.confirm('Are you sure you want to delete this task?')) {
-      deleteTask(taskId)
-      setSelectedTask(null)
-    }
+    deleteTask(taskId)
+    setSelectedTask(null)
   }
 
   const handleMove = (e, targetDate, targetTime) => {
@@ -189,16 +187,21 @@ const Timetable = ({ currentDate }) => {
     return date.toLocaleDateString('en-US', options);
   }
 
+  const hourHeight = 60; // Height of each hour slot in pixels
+
   return (
     <div className="timetable">
+      <button className="nav-button prev" onClick={goToPreviousWeek}>
+        <span className="arrow-icon">&gt;</span>
+      </button>
       <div className="timetable-grid">
         <div className="time-column">
           <div className="day-header"></div>
           {timeSlots.map((time) => (
-            <div key={time} className="time-slot">{time}</div>
+            <div key={time} className="time-slot" style={{ height: `${hourHeight}px` }}>{time}</div>
           ))}
         </div>
-        {visibleWeekDates.map((date) => {
+        {visibleDates.map((date) => {
           const dayOfWeek = daysOfWeek[date.getDay()]
           const formattedDate = date.toISOString().split('T')[0]
           return (
@@ -212,6 +215,7 @@ const Timetable = ({ currentDate }) => {
                   <div
                     key={`${formattedDate}-${time}`}
                     className="time-slot"
+                    style={{ height: `${hourHeight}px` }}
                     onDragOver={(e) => e.preventDefault()}
                     onDrop={(e) => handleMove(e, formattedDate, time)}
                   ></div>
@@ -226,6 +230,7 @@ const Timetable = ({ currentDate }) => {
                       onMove={handleMove}
                       timeRange={timeRange}
                       onClick={handleTaskClick}
+                      hourHeight={hourHeight}
                     />
                   ))}
               </div>
@@ -233,6 +238,9 @@ const Timetable = ({ currentDate }) => {
           )
         })}
       </div>
+      <button className="nav-button next" onClick={goToNextWeek}>
+        <span className="arrow-icon">&gt;</span>
+      </button>
       <TaskModal
         task={selectedTask}
         onClose={() => setSelectedTask(null)}

@@ -103,3 +103,17 @@
     display: table;
   }
 }
+
+.block-website-btn {
+  background-color: #ff3b3f;
+  color: white;
+  padding: 8px 16px;
+  border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.block-website-btn:hover {
+  background-color: #ff1e23;
+  transform: translateY(-2px);
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+}
