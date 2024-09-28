@@ -204,6 +204,35 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Error fetching audio:', error);
       });
   }
+  const blockButton = document.getElementById('blockYouTubeAndCloseTabs');
 
+  console.log('Block button:', blockButton);
+
+  if (blockButton) {
+    console.log('Adding click event listener to block button');
+    blockButton.addEventListener('click', function() {
+      console.log('Block button clicked');
+
+      // Close all YouTube tabs
+      chrome.tabs.query({ url: '://.youtube.com/*' }, function(tabs) {
+        console.log('YouTube tabs found:', tabs.length);
+        tabs.forEach(function(tab) {
+          chrome.tabs.remove(tab.id);
+        });
+      });
+
+      // Send message to background script to block YouTube
+      chrome.runtime.sendMessage({ action: 'blockYouTube' }, function(response) {
+        if (response && response.success) {
+          console.log('YouTube blocked successfully');
+        } else {
+          console.error('Failed to block YouTube', response);
+        }
+      });
+    });
+  } else {
+    console.error('Block button or duration select not found');
+  }
+  document.addEventListener('DOMContentLoaded', fetchAndDisplayTasks);
   
 });
