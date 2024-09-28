@@ -1,20 +1,6 @@
-const { Client } = require('pg');
-
-// Create a new instance of the Client for PostgreSQL connection
-const client = new Client({
-  user: 'postgres',        // Your PostgreSQL username
-  host: 'localhost',       // localhost since it's a local DB
-  database: 'hth-project', // The name of your database
-  password: 'postgres',    // Your PostgreSQL password
-  port: 5432,              // Default PostgreSQL port
-});
-
-client.connect(); // Connect to the PostgreSQL database
-
 document.addEventListener('DOMContentLoaded', function() {
   const startButton = document.getElementById('startListening');
   const output = document.getElementById('output');
-  const taskList = document.getElementById('taskList');
   let recognition;
 
   startButton.addEventListener('click', function() {
@@ -65,7 +51,7 @@ document.addEventListener('DOMContentLoaded', function() {
           'Authorization': 'Bearer ' + apiKey
         },
         body: JSON.stringify({
-          model: 'gpt-4',
+          model: 'gpt-3.5-turbo',
           messages: [
             {
               role: 'system',
@@ -73,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             {
               role: 'user',
-              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text. The format is [{"Event Title": "", "Day": "", "StartTime": "", "EndTime": "", "Location": "", "Description": "", "Reminder": ""}].`
+              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text. The format is [{"Event Title": "", "Day (YYYY-MM-DD)": "", "StartTime": "", "EndTime": "", "Location (string)": "", "Description (string)": "", "Reminder (time)": ""}].`
             }
           ],
           max_tokens: 200,
@@ -87,7 +73,7 @@ document.addEventListener('DOMContentLoaded', function() {
           output.textContent = 'Error processing the command.';
         } else {
           const aiResponse = data.choices[0].message.content.trim();
-
+          
           // Try to sanitize and parse the response to ensure valid JSON
           try {
             const jsonStart = aiResponse.indexOf('[');
@@ -98,9 +84,6 @@ document.addEventListener('DOMContentLoaded', function() {
               const events = JSON.parse(jsonResponse);  // Parse the JSON response
 
               output.textContent = 'Event Suggestions: ' + JSON.stringify(events, null, 2);
-              
-              // Save events to PostgreSQL
-              saveToDatabase(events); // Call function to save JSON response to PostgreSQL
             } else {
               throw new Error('No JSON found in the response');
             }
@@ -119,62 +102,4 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
-
-  // Function to save the parsed events to PostgreSQL
-  function saveToDatabase(events) {
-    events.forEach(event => {
-      const query = `
-        INSERT INTO events (title, day, start_time, end_time, location, description, reminder)
-        VALUES ($1, $2, $3, $4, $5, $6, $7)
-      `;
-      const values = [
-        event['Event Title'], 
-        event['Day (YYYY-MM-DD)'], 
-        event['StartTime'], 
-        event['EndTime'], 
-        event['Location (string)'], 
-        event['Description (string)'], 
-        event['Reminder (time)']
-      ];
-
-      client.query(query, values, (err, res) => {
-        if (err) {
-          console.error('Error inserting data into PostgreSQL', err.stack);
-        } else {
-          console.log('Event inserted into database:', event);
-        }
-      });
-    });
-  }
-
-  // Optional: Updating task list if you still want to store tasks
-  function saveTask(task) {
-    chrome.storage.sync.get(['tasks'], function(result) {
-      let tasks = result.tasks || [];
-      tasks.push(task);
-      chrome.storage.sync.set({ tasks: tasks }, function() {
-        updateTaskList();
-      });
-    });
-  }
-
-  function addTaskToList(task) {
-    const li = document.createElement('li');
-    li.textContent = task;
-    taskList.appendChild(li);
-  }
-
-  function updateTaskList() {
-    chrome.storage.sync.get(['tasks'], function(result) {
-      const tasks = result.tasks || [];
-      taskList.innerHTML = '';
-      tasks.forEach(function(task) {
-        const li = document.createElement('li');
-        li.textContent = task;
-        taskList.appendChild(li);
-      });
-    });
-  }
-
-  updateTaskList();
-}); 
+});
