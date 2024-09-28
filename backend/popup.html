@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Time Table Mommy</title>
+  <title>Time Table Sweetheart</title>
   <script src="popup.js"></script>
   <style>
     body {
@@ -11,16 +11,26 @@
       width: 300px;
       margin: 0;
       padding: 20px;
-      background-color: #f0f4f8;
+      background-color: #f7f9fc;
       color: #333;
+      transition: background-color 0.3s ease;
     }
     #taskList { margin-top: 20px; }
-    .task { border: 1px solid #ccc; padding: 10px; margin-bottom: 10px; }
+    .task { 
+      border: 1px solid #d1d9e6; 
+      padding: 10px; 
+      margin-bottom: 10px; 
+      border-radius: 5px; 
+      background-color: #fff; 
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1); 
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
     h1 {
       text-align: center;
-      color: #2c3e50;
+      color: #34495e;
       margin-bottom: 20px;
       font-size: 24px;
+      animation: slideIn 1s ease-in-out;
     }
     #startListening {
       display: block;
@@ -32,10 +42,11 @@
       border-radius: 5px;
       font-size: 16px;
       cursor: pointer;
-      transition: background-color 0.3s ease;
+      transition: background-color 0.3s ease, transform 0.2s ease;
     }
     #startListening:hover {
       background-color: #2980b9;
+      transform: scale(1.05);
     }
     #output {
       margin-top: 15px;
@@ -44,23 +55,25 @@
       border-radius: 5px;
       font-style: italic;
       text-align: center;
+      animation: fadeIn 1s ease-in-out;
     }
     h2 {
       margin-top: 20px;
-      color: #2c3e50;
+      color: #34495e;
       font-size: 18px;
+      animation: slideIn 1s ease-in-out;
     }
     #taskList {
       list-style-type: none;
       padding: 0;
     }
     #taskList li {
-      background-color: white;
+      background-color: #fff;
       margin-bottom: 10px;
       padding: 10px;
       border-radius: 5px;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      transition: transform 0.2s ease;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
     #taskList li:hover {
       transform: translateY(-2px);
@@ -70,18 +83,53 @@
       from { opacity: 0; }
       to { opacity: 1; }
     }
+    @keyframes slideIn {
+      from { transform: translateX(-100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
     .fade-in {
       animation: fadeIn 0.5s ease-in;
+    }
+    .slide-in {
+      animation: slideIn 1s ease-in-out;
+    }
+    a {
+      display: block;
+      text-align: center;
+      margin-top: 20px;
+      color: #3498db;
+      text-decoration: none;
+      font-size: 16px;
+      transition: color 0.3s ease;
+    }
+    a:hover {
+      color: #2980b9;
+    }
+    #blockYouTubeAndCloseTabs {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #e7c83c;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      margin-top: 20px;
+    }
+    #blockYouTubeAndCloseTabs:hover {
+      background-color: #df7817;
+      transform: scale(1.05);
     }
   </style>
 </head>
 <body>
-  <h1 class="fade-in">Time Table Mommy</h1>
-  <button id="startListening" class="fade-in">Start Listening</button>
+  <h1 class="slide-in">Time Table Sweetheart</h1>
   <div id="output" class="fade-in"></div>
-  <h2 class="fade-in">Tasks:</h2>
+  <h2 class="slide-in">Tasks:</h2>
   <ul id="taskList" class="fade-in"></ul>
   <a href="options.html">OpenAi</a>
-  <button id="blockYouTubeAndCloseTabs" class="fade-in">Block YouTube &amp; Close All Youtube Tabs</button>
+  <button id="blockYouTubeAndCloseTabs" class="fade-in">Block DISTRACTIONS &#x1F6AB;</button>
 </body>
 </html>
