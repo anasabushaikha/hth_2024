@@ -1,0 +1,17 @@
+
+{
+    "manifest_version": 3,
+    "name": "Time Table Mommy",
+    "version": "1.0",
+    "description": "Store tasks using voice commands",
+    "permissions": ["storage", "scripting"],
+    "host_permissions": ["https://api.openai.com/*"],
+    "options_page": "options.html",
+    "action": {
+        "default_popup": "popup.html",
+        "default_title": "Voice Task Manager with AI"
+    },
+    "background": {
+        "service_worker": "background.js"
+    }
+}
