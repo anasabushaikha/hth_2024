@@ -78,10 +78,15 @@ app.post('/generateSpeech', async (req, res) => {
         'Content-Type': 'application/json'
       },
       data: {
-        model: 'tts-1',
-        voice: 'alloy',
-        input: message
+        model: 'tts-1', // or 'tts-1-hd' for higher quality
+        voice: 'shimmer', // try Shimmer for a soft and soothing tone
+        input: message,
+        options: {
+          pitch: -2, // lower pitch slightly for a more soothing sound
+          speed: 0.9 // reduce speed for a calming effect
+        }
       },
+      
       responseType: 'stream'
     });
 
