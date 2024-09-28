@@ -36,11 +36,11 @@ function App() {
           <Route path="/" element={
             <div className="timetable-container">
               <button className="nav-button prev" onClick={goToPreviousWeek}>
-                <span className="arrow-icon">&#9664;</span>
+                <span className="arrow-icon">&gt;</span>
               </button>
               <Timetable currentDate={currentDate} />
               <button className="nav-button next" onClick={goToNextWeek}>
-                <span className="arrow-icon">&#9654;</span>
+                <span className="arrow-icon">&gt;</span>
               </button>
             </div>
           } />

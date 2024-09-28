@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Time Table Mommy</title>
+  <script src="popup.js"></script>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      width: 300px;
+      margin: 0;
+      padding: 20px;
+      background-color: #f0f4f8;
+      color: #333;
+    }
+    h1 {
+      text-align: center;
+      color: #2c3e50;
+      margin-bottom: 20px;
+      font-size: 24px;
+    }
+    #startListening {
+      display: block;
+      width: 100%;
+      padding: 10px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      font-size: 16px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+    }
+    #startListening:hover {
+      background-color: #2980b9;
+    }
+    #output {
+      margin-top: 15px;
+      padding: 10px;
+      background-color: #ecf0f1;
+      border-radius: 5px;
+      font-style: italic;
+      text-align: center;
+    }
+    h2 {
+      margin-top: 20px;
+      color: #2c3e50;
+      font-size: 18px;
+    }
+    #taskList {
+      list-style-type: none;
+      padding: 0;
+    }
+    #taskList li {
+      background-color: white;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 5px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      transition: transform 0.2s ease;
+    }
+    #taskList li:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    }
+    @keyframes fadeIn {
+      from { opacity: 0; }
+      to { opacity: 1; }
+    }
+    .fade-in {
+      animation: fadeIn 0.5s ease-in;
+    }
+  </style>
+</head>
+<body>
+  <h1 class="fade-in">Time Table Mommy</h1>
+  <button id="startListening" class="fade-in">Start Listening</button>
+  <div id="output" class="fade-in"></div>
+  <h2 class="fade-in">Tasks:</h2>
+  <ul id="taskList" class="fade-in"></ul>
+  <a href="options.html">OpenAi</a>
+</body>
+</html>

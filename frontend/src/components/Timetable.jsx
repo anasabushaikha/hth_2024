@@ -12,12 +12,23 @@ const TaskItem = ({ task, onDelete, onMove, timeRange, onClick }) => {
   const taskStart = (startMinutes - timeRange.start * 60) / 60
   const taskHeight = task.duration / 60
 
+  const formatTime = (time) => {
+    const [hours, minutes] = time.split(':')
+    const hour = parseInt(hours)
+    const ampm = hour >= 12 ? 'PM' : 'AM'
+    const formattedHour = hour % 12 || 12
+    return `${formattedHour}:${minutes} ${ampm}`
+  }
+
+  const minHeight = 24 // Minimum height to display the title
+  const isShortTask = taskHeight * 60 < minHeight * 2 // Check if task is too short to display all info
+
   return (
     <div
-      className="task-item"
+      className={`task-item ${isShortTask ? 'short-task' : ''}`}
       style={{
-        top: `${taskStart * 60}px`,
-        height: `${taskHeight * 60}px`,
+        top: `${taskStart * 60 + 60}px`, // Add 60px to account for the day header
+        height: `${Math.max(taskHeight * 60, minHeight)}px`,
         borderLeftColor: bgColor,
       }}
       draggable
@@ -27,13 +38,37 @@ const TaskItem = ({ task, onDelete, onMove, timeRange, onClick }) => {
       onClick={() => onClick(task)}
     >
       <div className="task-title">{task.title}</div>
-      <div className="task-duration">{task.duration} min</div>
+      {!isShortTask && (
+        <>
+          <div className="task-time">{formatTime(task.startTime)}</div>
+          <div className="task-duration">{task.duration} min</div>
+        </>
+      )}
     </div>
   )
 }
 
 const TaskModal = ({ task, onClose, onDelete }) => {
   if (!task) return null;
+
+  const formatDateTime = (dateString, timeString) => {
+    const date = new Date(dateString);
+    const currentYear = new Date().getFullYear();
+    const [hours, minutes] = timeString.split(':');
+    const ampm = hours >= 12 ? 'PM' : 'AM';
+    const formattedHours = hours % 12 || 12;
+    const formattedTime = `${formattedHours}:${minutes} ${ampm}`;
+    
+    const options = { 
+      weekday: 'long', 
+      month: 'long', 
+      day: 'numeric',
+      year: date.getFullYear() !== currentYear ? 'numeric' : undefined
+    };
+    
+    const formattedDate = date.toLocaleDateString('en-US', options);
+    return `${formattedDate} at ${formattedTime}`;
+  };
 
   return (
     <div className="task-modal-overlay" onClick={onClose}>
@@ -42,11 +77,7 @@ const TaskModal = ({ task, onClose, onDelete }) => {
         <div className="task-details">
           <div className="task-detail-item">
             <span className="task-icon">📅</span>
-            <span>{task.date}</span>
-          </div>
-          <div className="task-detail-item">
-            <span className="task-icon">🕒</span>
-            <span>{task.startTime}</span>
+            <span>{formatDateTime(task.date, task.startTime)}</span>
           </div>
           <div className="task-detail-item">
             <span className="task-icon">⏱️</span>
@@ -149,6 +180,15 @@ const Timetable = ({ currentDate }) => {
     setSelectedTask(task)
   }
 
+  const formatDate = (date) => {
+    const options = { 
+      month: 'short', 
+      day: 'numeric',
+      year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
+    };
+    return date.toLocaleDateString('en-US', options);
+  }
+
   return (
     <div className="timetable">
       <div className="timetable-grid">
@@ -164,8 +204,8 @@ const Timetable = ({ currentDate }) => {
           return (
             <div key={formattedDate} className="day-column">
               <div className="day-header">
-                {dayOfWeek}<br />
-                {formattedDate}
+                <div className="day-name">{dayOfWeek}</div>
+                <div className="day-date">{formatDate(date)}</div>
               </div>
               <div className="day-tasks">
                 {timeSlots.map((time) => (

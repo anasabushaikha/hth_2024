@@ -43,7 +43,7 @@ input, textarea {
   border-radius: 8px;
   border-left: 5px solid #ffa07a;
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-  padding: 12px;
+  padding: 8px;
   margin-bottom: 10px;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -52,6 +52,10 @@ input, textarea {
   right: 5px;
   overflow: hidden;
   z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
 }
 
 .task-item::before {
@@ -77,13 +81,14 @@ input, textarea {
 
 .task-title {
   font-weight: bold;
-  font-size: 1em;
-  margin-bottom: 5px;
+  font-size: 0.9em;
   color: #333;
-  transition: color 0.3s ease;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  text-align: left;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  width: 100%;
+  margin-bottom: 4px;
+  line-height: 1.2;
 }
 
 .task-item:hover .task-title {
@@ -91,7 +96,7 @@ input, textarea {
 }
 
 .task-duration {
-  font-size: 0.8em;
+  font-size: 0.7em;
   color: #666;
   font-style: italic;
   transition: color 0.3s ease;
@@ -202,7 +207,7 @@ h1, h2 {
 }
 
 .timetable {
-  padding: 20px 0;
+  padding-top: 60px; /* Add padding to account for the day header */
   width: 100%;
   overflow-x: auto;
 }
@@ -211,26 +216,49 @@ h1, h2 {
   position: fixed;
   top: 50%;
   transform: translateY(-50%);
-  background-color: rgba(255, 126, 130, 0.5);
+  background-color: rgba(255, 126, 130, 0.7);
   border: none;
   color: white;
   font-size: 24px;
-  padding: 20px 10px;
+  padding: 0;
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 10;
+  border-radius: 5px;
+  width: 50px;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .nav-button.prev {
-  left: 10px; /* Move slightly away from the edge */
+  left: 10px;
 }
 
 .nav-button.next {
-  right: 10px; /* Move slightly away from the edge */
+  right: 10px;
+}
+
+.nav-button:hover {
+  background-color: rgba(255, 90, 95, 1);
+  transform: translateY(-50%) scale(1.1);
+  box-shadow: 0 0 15px rgba(255, 90, 95, 0.5);
 }
 
 .arrow-icon {
-  display: inline-block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  font-size: 30px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.nav-button.prev .arrow-icon {
+  transform: scaleX(-1);
 }
 
 @keyframes pulse {
@@ -248,49 +276,20 @@ h1, h2 {
 .timetable-grid {
   display: flex;
   width: 100%;
-  min-width: 1000px; /* Adjust this value based on your needs */
+  min-width: 1000px;
 }
 
 .time-column,
 .day-column {
   flex: 1;
   min-width: 0;
+  display: flex;
+  flex-direction: column;
 }
 
 .time-column {
   flex: 0 0 60px;
-  padding-top: 40px; /* Adjust this value to match the height of your day headers */
-}
-
-.day-header {
-  font-weight: bold;
-  padding: 10px;
-  background-color: #ff9a9e;
-  color: white;
-  text-align: center;
-  position: sticky;
-  top: 0;
-  z-index: 2;
-}
-
-.time-column .day-header {
-  display: none; /* This will hide the pink box above the timeline */
-}
-
-.time-slot {
-  height: auto; /* Change from fixed height to auto */
-  min-height: 60px; /* Add a minimum height */
-  border-bottom: 1px solid #e0e0e0;
-  padding: 5px;
-  font-size: 0.8em;
-  position: relative; /* Add this */
-}
-
-.time-column .time-slot {
-  text-align: right;
-  padding-right: 10px;
-  font-weight: bold;
-  color: #666;
+  padding-top: 60px; /* Add padding to align with day columns */
 }
 
 .day-column {
@@ -298,8 +297,69 @@ h1, h2 {
   position: relative;
 }
 
+.day-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px; /* Set a fixed height for the day header */
+  z-index: 2;
+  background-color: #3498db; /* Flat blue color */
+  color: white;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid #2980b9; /* Darker blue border */
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: all 0.3s ease;
+}
+
+.day-header:hover {
+  background-color: #2980b9; /* Darker blue on hover */
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.15);
+}
+
+.day-name {
+  font-weight: bold;
+  font-size: 1.1em;
+  margin-bottom: 2px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.day-date {
+  font-size: 0.9em;
+  opacity: 0.9;
+}
+
+.time-column .day-header {
+  background: transparent;
+  border-bottom: none;
+  box-shadow: none;
+}
+
+.time-slot {
+  height: 60px;
+  border-bottom: 1px solid #e0e0e0;
+  padding: 0;
+  font-size: 0.8em;
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+}
+
+.time-column .time-slot {
+  padding-right: 10px;
+  font-weight: bold;
+  color: #666;
+}
+
 .day-tasks {
   position: relative;
+  height: calc(100% - 60px); /* Subtract the height of the day header */
 }
 
 .task-item {
@@ -310,30 +370,27 @@ h1, h2 {
   cursor: pointer;
   transition: all 0.3s ease;
   z-index: 1;
-  position: absolute; /* Keep this */
+  position: absolute;
   left: 5px;
   right: 5px;
 }
 
-.task-item:hover {
-  transform: scale(1.02);
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+.short-task {
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.task-title {
-  font-weight: bold;
-  font-size: 1em;
-  margin-bottom: 2px;
+.short-task .task-title {
+  margin-bottom: 0;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
 }
 
-.task-duration {
-  font-size: 0.9em;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+.short-task .task-time,
+.short-task .task-duration {
+  display: none;
 }
 
 .week-navigation {
@@ -459,5 +516,3 @@ h1, h2 {
   background-color: #5a6268;
   transform: scale(1.05);
 }
-
-/* ... (rest of the styles remain unchanged) ... */
