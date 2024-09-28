@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const startButton = document.getElementById('startListening');
   const output = document.getElementById('output');
+  const taskList = document.getElementById('taskList');
   let recognition;
 
   startButton.addEventListener('click', function() {
@@ -22,7 +23,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Check for the test command
         if (spokenText.toLowerCase() === 'test reminder') {
-          insertTestEvent();
+          insertTestEvent(); // Assuming insertTestEvent is defined elsewhere
         } else {
           // Pass the spoken text directly to ChatGPT
           processCommand(spokenText);
@@ -51,6 +52,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
+      console.log('API Key retrieved:', apiKey); // Log API key retrieval
+
       fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -73,8 +76,12 @@ document.addEventListener('DOMContentLoaded', function() {
           temperature: 0.7
         })
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('API response status:', response.status); // Log response status
+        return response.json();
+      })
       .then(data => {
+        console.log('API response data:', data); // Log response data
         if (data.error) {
           console.error('OpenAI API Error:', data.error);
           output.textContent = 'Error processing the command.';
@@ -130,19 +137,83 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       body: JSON.stringify({ events }),  // Send the events data to the backend
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
     .then(data => {
+      console.log('Backend response:', data);  // Log the response from backend
       if (data.success) {
         output.textContent = 'Events inserted successfully!';
-        // Schedule reminders for the events
+        // Schedule reminders for the events (assuming scheduleReminders is defined elsewhere)
         scheduleReminders(events);
+        fetchAndDisplayTasks(); // Refresh the task list
       } else {
+        console.error('Backend Error:', data.message);
         output.textContent = 'Error inserting events: ' + data.message;
       }
     })
     .catch(error => {
       console.error('Error inserting events:', error);
       output.textContent = 'Error inserting events.';
+    });
+  }
+
+  function fetchAndDisplayTasks() {
+    fetch('http://localhost:3000/getEvents')
+      .then(response => response.json())
+      .then(data => {
+        taskList.innerHTML = ''; // Clear the current list
+        data.events.forEach(event => {
+          const li = document.createElement('li');
+          li.className = 'task';
+          li.innerHTML = `
+            <strong>${event.event_title}</strong><br>
+            ${event.event_day} ${event.start_time} - ${event.end_time}<br>
+            ${event.location}<br>
+            ${event.description}<br>
+            <button class="delete-task" data-id="${event.id}">Delete</button>
+          `;
+          taskList.appendChild(li);
+        });
+
+        // Add event listeners to delete buttons
+        document.querySelectorAll('.delete-task').forEach(button => {
+          button.addEventListener('click', function() {
+            const taskId = this.getAttribute('data-id');
+            deleteTask(taskId);
+          });
+        });
+      })
+      .catch(error => {
+        console.error('Error fetching tasks:', error);
+        output.textContent = 'Error fetching tasks.';
+      });
+  }
+
+  function deleteTask(taskId) {
+    fetch(`http://localhost:3000/deleteEvent/${taskId}`, {
+      method: 'DELETE'
+    })
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
+    .then(data => {
+      if (data.success) {
+        fetchAndDisplayTasks(); // Refresh the task list
+      } else {
+        console.error('Backend Error:', data.message);
+        output.textContent = 'Error deleting task: ' + data.message;
+      }
+    })
+    .catch(error => {
+      console.error('Error deleting task:', error);
+      output.textContent = 'Error deleting task.';
     });
   }
 
@@ -177,5 +248,5 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // Call the function when the popup is opened
-  document.addEventListener('DOMContentLoaded', fetchAndDisplayTasks);
+  fetchAndDisplayTasks();
 });
