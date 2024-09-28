@@ -153,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
         event["Day"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
       }
     });
-
+  
     fetch('http://localhost:3000/insertEvents', {
       method: 'POST',
       headers: {
@@ -165,13 +165,45 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       if (data.success) {
         output.textContent = 'Events inserted successfully!';
+        speakMessage('You sexy beast! Events have been inserted successfully! Good job, sweetheart!');
       } else {
         output.textContent = 'Error inserting events: ' + data.message;
+        speakMessage('There was an error inserting the events. Try again later, dear.');
       }
     })
     .catch(error => {
       console.error('Error inserting events:', error);
       output.textContent = 'Error inserting events.';
+      speakMessage('There was an error inserting the events, honey. Please check the issue.');
     });
   }
+  
+  // Function to handle speaking the message
+  // Function to handle speaking the message using OpenAI TTS (Node.js backend)
+  function speakMessage(message) {
+    fetch('http://localhost:3000/generateSpeech', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message }),  // Send the message to the backend
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error generating speech');
+        }
+        return response.blob();  // Get the audio as a Blob
+      })
+      .then(audioBlob => {
+        // Create an audio element and play the audio
+        const audioURL = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioURL);
+        audio.play();
+      })
+      .catch(error => {
+        console.error('Error fetching audio:', error);
+      });
+  }
+
+  
 });
