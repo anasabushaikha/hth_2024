@@ -1,3 +1,16 @@
+const { Client } = require('pg');
+
+// Create a new instance of the Client for PostgreSQL connection
+const client = new Client({
+  user: 'your_username', // Replace with your PostgreSQL username
+  host: 'localhost', // Since you're connecting to a local PostgreSQL server
+  database: 'your_database', // Replace with the name of your PostgreSQL database
+  password: 'your_password', // Replace with your PostgreSQL password
+  port: 5432, // Default PostgreSQL port
+});
+
+client.connect(); // Connect to the PostgreSQL database
+
 document.addEventListener('DOMContentLoaded', function() {
   const startButton = document.getElementById('startListening');
   const output = document.getElementById('output');
@@ -35,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function processCommand(command) {
     startButton.disabled = true;
-  
+
     chrome.storage.local.get(['openaiApiKey'], function(result) {
       const apiKey = result.openaiApiKey;
       if (!apiKey) {
@@ -44,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         startButton.disabled = false;
         return;
       }
-  
+
       fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -74,17 +87,20 @@ document.addEventListener('DOMContentLoaded', function() {
           output.textContent = 'Error processing the command.';
         } else {
           const aiResponse = data.choices[0].message.content.trim();
-          
+
           // Try to sanitize and parse the response to ensure valid JSON
           try {
             const jsonStart = aiResponse.indexOf('[');
             const jsonEnd = aiResponse.lastIndexOf(']') + 1;
-  
+
             if (jsonStart !== -1 && jsonEnd !== -1) {
               const jsonResponse = aiResponse.substring(jsonStart, jsonEnd);
               const events = JSON.parse(jsonResponse);  // Parse the JSON response
-  
+
               output.textContent = 'Event Suggestions: ' + JSON.stringify(events, null, 2);
+              
+              // Save events to PostgreSQL
+              saveToDatabase(events); // Call function to save JSON response to PostgreSQL
             } else {
               throw new Error('No JSON found in the response');
             }
@@ -103,34 +119,32 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
-  
-  
-  
-  
-  
-  function fetchWeather(command) {
-    // Replace this with your OpenWeatherMap API key
-    const apiKey = 'YOUR_OPENWEATHERMAP_API_KEY';
-    const city = 'Ottawa';  // Extract this from the command if needed
-    
-    fetch(`https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${apiKey}&units=metric`)
-      .then(response => response.json())
-      .then(data => {
-        if (data.cod === 200) {
-          const weatherDescription = data.weather[0].description;
-          const temperature = data.main.temp;
-          output.textContent = `Current weather in ${city}: ${weatherDescription}, ${temperature}°C`;
+
+  // Function to save the parsed events to PostgreSQL
+  function saveToDatabase(events) {
+    events.forEach(event => {
+      const query = `
+        INSERT INTO events (title, day, start_time, end_time, location, description, reminder)
+        VALUES ($1, $2, $3, $4, $5, $6, $7)
+      `;
+      const values = [
+        event['Event Title'], 
+        event['Day (YYYY-MM-DD)'], 
+        event['StartTime'], 
+        event['EndTime'], 
+        event['Location (string)'], 
+        event['Description (string)'], 
+        event['Reminder (time)']
+      ];
+
+      client.query(query, values, (err, res) => {
+        if (err) {
+          console.error('Error inserting data into PostgreSQL', err.stack);
         } else {
-          output.textContent = 'Error fetching weather data.';
+          console.log('Event inserted into database:', event);
         }
-      })
-      .catch(error => {
-        console.error('Weather API Error:', error);
-        output.textContent = 'Error communicating with the weather service.';
-      })
-      .finally(() => {
-        startButton.disabled = false;
       });
+    });
   }
 
   // Optional: Updating task list if you still want to store tasks
@@ -163,4 +177,4 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   updateTaskList();
-});
+}); 
