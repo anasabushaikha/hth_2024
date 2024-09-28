@@ -52,15 +52,15 @@ document.addEventListener('DOMContentLoaded', function() {
           'Authorization': 'Bearer ' + apiKey
         },
         body: JSON.stringify({
-          model: 'gpt-3.5-turbo',
+          model: 'gpt-4',
           messages: [
             {
               role: 'system',
-              content: 'You are an assistant that organizes a daily schedule into calendar events. Return the response as JSON only, without any human text, in the following format: [{"Event Name": "", "Date": "", "StartTime": "", "EndTime": "", "Location": ""}].'
+              content: 'You are an assistant that organizes a daily schedule into calendar events. Return the response as JSON only, without any human text, in the following format: [{"Event Title": "", "Day (YYYY-MM-DD)": "", "StartTime": "", "EndTime": "", "Location (string)": "", "Description (string)": "", "Reminder (time)": ""}].'
             },
             {
               role: 'user',
-              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text. The format is [{"Event Name": "", "Date": "", "StartTime": "", "EndTime": "", "Location": ""}].`
+              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text. The format is [{"Event Title": "", "Day": "", "StartTime": "", "EndTime": "", "Location": "", "Description": "", "Reminder": ""}].`
             }
           ],
           max_tokens: 200,
@@ -77,14 +77,13 @@ document.addEventListener('DOMContentLoaded', function() {
           
           // Try to sanitize and parse the response to ensure valid JSON
           try {
-            // Extract the JSON from the response by looking for valid JSON brackets
             const jsonStart = aiResponse.indexOf('[');
             const jsonEnd = aiResponse.lastIndexOf(']') + 1;
-            
+  
             if (jsonStart !== -1 && jsonEnd !== -1) {
               const jsonResponse = aiResponse.substring(jsonStart, jsonEnd);
               const events = JSON.parse(jsonResponse);  // Parse the JSON response
-              
+  
               output.textContent = 'Event Suggestions: ' + JSON.stringify(events, null, 2);
             } else {
               throw new Error('No JSON found in the response');
@@ -104,6 +103,7 @@ document.addEventListener('DOMContentLoaded', function() {
       });
     });
   }
+  
   
   
   
