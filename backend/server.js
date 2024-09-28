@@ -12,7 +12,7 @@ const port = 3000;
 app.use(cors());
 app.use(express.json());
 
-// Endpoint to handle event insertion
+// POST to handle event insertion
 app.post('/insertEvents', async (req, res) => {
   const events = req.body.events;
 
@@ -60,3 +60,5 @@ app.post('/insertEvents', async (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+

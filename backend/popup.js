@@ -1,4 +1,6 @@
 document.addEventListener('DOMContentLoaded', function() {
+  console.log('DOM content loaded');
+
   const startButton = document.getElementById('startListening');
   const output = document.getElementById('output');
   let recognition;
@@ -18,8 +20,13 @@ document.addEventListener('DOMContentLoaded', function() {
         const spokenText = event.results[0][0].transcript;
         output.textContent = 'Processing command...';
 
-        // Pass the spoken text directly to ChatGPT
-        processCommand(spokenText);
+        // Check for the test command
+        if (spokenText.toLowerCase() === 'test reminder') {
+          insertTestEvent();
+        } else {
+          // Pass the spoken text directly to ChatGPT
+          processCommand(spokenText);
+        }
       };
 
       recognition.onerror = function(event) {
@@ -91,9 +98,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
           } catch (error) {
             console.error('JSON Parse Error:', error);
-            // output.textContent = 'Error parsing JSON response. Please check the response format.';
-            // setTimeout(2000)
-            output.textContent = error
+            output.textContent = error;
           }
         }
       })
@@ -109,7 +114,6 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function insertEventsIntoDatabase(events) {
     events.forEach(event => {
-      // Check if the date is valid and can be parsed
       const parsedDate = new Date(event["Day"]);
       if (isNaN(parsedDate.getTime())) {
         console.error(`Invalid date format: ${event["Day"]}`);
@@ -130,6 +134,8 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       if (data.success) {
         output.textContent = 'Events inserted successfully!';
+        // Schedule reminders for the events
+        scheduleReminders(events);
       } else {
         output.textContent = 'Error inserting events: ' + data.message;
       }
@@ -139,7 +145,37 @@ document.addEventListener('DOMContentLoaded', function() {
       output.textContent = 'Error inserting events.';
     });
   }
-  
-  
-  
+
+  const blockButton = document.getElementById('blockYouTubeAndCloseTabs');
+
+  console.log('Block button:', blockButton);
+
+  if (blockButton) {
+    console.log('Adding click event listener to block button');
+    blockButton.addEventListener('click', function() {
+      console.log('Block button clicked');
+
+      // Close all YouTube tabs
+      chrome.tabs.query({ url: '*://*.youtube.com/*' }, function(tabs) {
+        console.log('YouTube tabs found:', tabs.length);
+        tabs.forEach(function(tab) {
+          chrome.tabs.remove(tab.id);
+        });
+      });
+
+      // Send message to background script to block YouTube
+      chrome.runtime.sendMessage({ action: 'blockYouTube' }, function(response) {
+        if (response && response.success) {
+          console.log('YouTube blocked successfully');
+        } else {
+          console.error('Failed to block YouTube', response);
+        }
+      });
+    });
+  } else {
+    console.error('Block button or duration select not found');
+  }
+
+  // Call the function when the popup is opened
+  document.addEventListener('DOMContentLoaded', fetchAndDisplayTasks);
 });
