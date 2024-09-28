@@ -1,10 +1,9 @@
- 
 import { create } from 'zustand';
 import { useEffect } from 'react';
 import axios from 'axios';
- 
+
 const generateId = () => Math.random().toString(36).substr(2, 9);
- 
+
 export const useTaskStore = create((set) => ({
   tasks: [],
   setTasks: (tasks) => set({ tasks }),
@@ -30,39 +29,34 @@ export const useTaskStore = create((set) => ({
     return { success: true, message: 'Task updated successfully' };
   },
 }));
- 
+
 // Custom hook to fetch tasks from the server
 export const useFetchTasks = () => {
   const { tasks, setTasks } = useTaskStore();
- 
+
   useEffect(() => {
     const fetchTasks = async () => {
       try {
         const response = await axios.get('http://localhost:3000/getEvents');
        
         const fetchedEvents = response.data.map((event) => ({
-          id: generateId(),  // Generate a new ID for each event
-          title: event.event_title,
-          duration: event.end_time - event.start_time,  // Assuming you need to calculate duration
-          startTime: event.start_time,
-          date: event.event_day,
+          id: event.id,
+          title: event.title,
+          duration: event.duration,
+          startTime: event.starttime,
+          date: new Date(event.date).toISOString().split('T')[0], // Convert to ISO string and take the date part
         }));
-        console.log(fetchedEvents)
+        console.log(fetchedEvents);
         setTasks(fetchedEvents);
       } catch (error) {
         console.error('Error fetching events:', error);
       }
     };
- 
+
     fetchTasks();
   }, [setTasks]);
 
-  return tasks
+  return tasks;
 };
- 
-//export default useTaskStore;
-// export {useFetchTasks} ;
- 
- 
- 
- 
+
+export default useTaskStore;

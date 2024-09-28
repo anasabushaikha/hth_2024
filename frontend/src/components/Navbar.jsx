@@ -8,17 +8,20 @@ const Navbar = () => {
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
           <span role="img" aria-label="calendar">📅</span>
-          TimeTable Mommie
+          <span className="navbar-logo-text">TimeTable Sweetie</span>
         </Link>
         <ul className="navbar-menu">
           <li className="navbar-item">
-            <Link to="/" className="navbar-link">Home</Link>
+            <Link to="/" className="navbar-link">
+              <span className="icon">🏠</span>
+              Home
+            </Link>
           </li>
           <li className="navbar-item">
-            <Link to="/add-task" className="navbar-link">Add Task</Link>
-          </li>
-          <li className="navbar-item">
-            <Link to="/block-website" className="navbar-link block-website-btn">Block Website</Link>
+            <Link to="/block-website" className="navbar-link block-website-btn">
+              <span className="icon">🚫</span>
+              Block Website
+            </Link>
           </li>
         </ul>
       </div>
