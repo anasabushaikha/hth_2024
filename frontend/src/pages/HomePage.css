@@ -1,0 +1,38 @@
+.home-page {
+  min-height: calc(100vh - 64px);
+}
+
+.product-card {
+  border-radius: 10px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.product-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 12px 20px rgba(0, 0, 0, 0.15);
+}
+
+.product-image {
+  width: 100%;
+  height: 200px;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+@media (max-width: 30em) {
+  .home-page {
+    padding: 4;
+  }
+}
+
+@media (max-width: 48em) {
+  .home-page {
+    padding: 6;
+  }
+}
