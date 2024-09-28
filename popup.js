@@ -59,7 +59,7 @@ document.addEventListener('DOMContentLoaded', function() {
             },
             {
               role: 'user',
-              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text. The format is [{"Event Title": "", "Day (YYYY-MM-DD)": "", "StartTime": "", "EndTime": "", "Location (string)": "", "Description (string)": "", "Reminder (time)": ""}].`
+              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text. The format is [{"Event Title": "", "Day": "", "StartTime": "", "EndTime": "", "Location": "", "Description": "", "Reminder": ""}].`
             }
           ],
           max_tokens: 200,
