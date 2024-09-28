@@ -35,9 +35,18 @@
   text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
 }
 
-.navbar-logo span {
-  margin-right: 10px;
-  font-size: 2.5rem;
+.navbar-logo-text {
+  font-family: 'Pacifico', cursive; /* A more curvy, handwritten font */
+  font-size: 1.8rem; /* Increased from 1.5rem */
+  color: #FFFFFF; /* Changed to white for better contrast */
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5); /* Darker shadow for more contrast */
+  transition: all 0.3s ease;
+}
+
+.navbar-logo:hover .navbar-logo-text {
+  color: #FFD700; /* Changed to gold color on hover */
+  text-shadow: 2px 2px 8px rgba(0, 0, 0, 0.7);
+  transform: scale(1.05);
 }
 
 .navbar-menu {
@@ -49,6 +58,7 @@
 
 .navbar-item {
   height: 80px;
+  padding: 0 10px;
 }
 
 .navbar-link {
@@ -60,12 +70,32 @@
   height: 100%;
   font-weight: bold;
   transition: all 0.3s ease;
+  border-radius: 20px;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3); /* Added text shadow for better readability */
 }
 
 .navbar-link:hover {
-  color: #ffd1dc;
   background-color: rgba(255, 255, 255, 0.2);
+  transform: translateY(-2px);
+  color: #FFD700; /* Changed to gold color on hover */
+}
+
+.navbar-link .icon {
+  margin-right: 8px;
+  font-size: 1.2em;
+}
+
+.block-website-btn {
+  background-color: #ff3b3f;
+  padding: 8px 16px;
   border-radius: 20px;
+  transition: all 0.3s ease;
+}
+
+.block-website-btn:hover {
+  background-color: #ff1e23;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+  color: #FFD700; /* Changed to gold color on hover */
 }
 
 @media screen and (max-width: 960px) {

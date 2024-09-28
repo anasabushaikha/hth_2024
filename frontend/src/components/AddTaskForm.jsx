@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import useTaskStore from '../store/product'
+import { useTaskStore } from '../store/product'
+import './AddTaskForm.css'
 
 const AddTaskForm = () => {
   const [title, setTitle] = useState('')
@@ -22,36 +23,49 @@ const AddTaskForm = () => {
   }
 
   return (
-    <div className="add-task-form">
+    <div className="add-task-container">
+      <div className="floating-element heart">❤️</div>
+      <div className="floating-element star">⭐</div>
+      <div className="floating-element cloud">☁️</div>
       <h2>Add New Task</h2>
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          placeholder="Task title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          required
-        />
-        <input
-          type="date"
-          value={date}
-          onChange={(e) => setDate(e.target.value)}
-          required
-        />
-        <input
-          type="time"
-          value={startTime}
-          onChange={(e) => setStartTime(e.target.value)}
-          required
-        />
-        <input
-          type="number"
-          placeholder="Duration (in minutes)"
-          value={duration}
-          onChange={(e) => setDuration(e.target.value)}
-          required
-        />
-        <button type="submit">Add Task</button>
+      <form onSubmit={handleSubmit} className="add-task-form">
+        <div className="input-container">
+          <input
+            type="text"
+            value={title}
+            onChange={(e) => setTitle(e.target.value)}
+            required
+          />
+          <label className="input-label">Task Title</label>
+        </div>
+        <div className="input-container">
+          <input
+            type="date"
+            value={date}
+            onChange={(e) => setDate(e.target.value)}
+            required
+          />
+          <label className="input-label">Date</label>
+        </div>
+        <div className="input-container">
+          <input
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            required
+          />
+          <label className="input-label">Start Time</label>
+        </div>
+        <div className="input-container">
+          <input
+            type="number"
+            value={duration}
+            onChange={(e) => setDuration(e.target.value)}
+            required
+          />
+          <label className="input-label">Duration (minutes)</label>
+        </div>
+        <button type="submit" className="add-button">Add Task</button>
       </form>
     </div>
   )
