@@ -1,12 +1,15 @@
-const express = require('express');
-const { Client } = require('pg');
-const cors = require('cors');  // Add this line
+import express from 'express';
+import pkg from 'pg';  // Import pg as a package
+import cors from 'cors';  // Import cors
+
+// Destructure Client from the pg package
+const { Client } = pkg;
 
 const app = express();
 const port = 3000;
 
 // Enable CORS for all routes
-app.use(cors());  // Add this line
+app.use(cors());
 app.use(express.json());
 
 // Endpoint to handle event insertion

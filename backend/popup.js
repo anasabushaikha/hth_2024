@@ -55,11 +55,11 @@ document.addEventListener('DOMContentLoaded', function() {
           messages: [
             {
               role: 'system',
-              content: 'You are an assistant that organizes a daily schedule into calendar events. Return the response as JSON only, without any human text, in the following format: [{"Event Title": "", "Day (YYYY-MM-DD)": "", "StartTime": "", "EndTime": "", "Location (string)": "", "Description (string)": "", "Reminder (time)": ""}].'
+              content: 'You are an assistant that organizes a daily schedule into calendar events. Return the response as JSON only, without any human text, in the following format: [{"Event Title": "", "Day": "YYYY-MM-DD", "StartTime": "", "EndTime": "", "Location": "", "Description": "", "Reminder": ""}].'
             },
             {
               role: 'user',
-              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text. The format is [{"Event Title": "", "Day": "", "StartTime": "", "EndTime": "", "Location": "", "Description": "", "Reminder": ""}].`
+              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text. The format is [{"Event Title": "", "Day": "YYYY-MM-DD", "StartTime": "", "EndTime": "", "Location": "", "Description": "", "Reminder": ""}].`
             }
           ],
           max_tokens: 200,
@@ -108,6 +108,17 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   function insertEventsIntoDatabase(events) {
+    events.forEach(event => {
+      // Check if the date is valid and can be parsed
+      const parsedDate = new Date(event["Day"]);
+      if (isNaN(parsedDate.getTime())) {
+        console.error(`Invalid date format: ${event["Day"]}`);
+        event["Day"] = null;  // Set to null or handle as needed
+      } else {
+        event["Day"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
+      }
+    });
+  
     fetch('http://localhost:3000/insertEvents', {
       method: 'POST',
       headers: {
@@ -125,8 +136,10 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .catch(error => {
       console.error('Error inserting events:', error);
-      output.textContent = error;
+      output.textContent = 'Error inserting events.';
     });
   }
+  
+  
   
 });
