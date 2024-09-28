@@ -15,7 +15,9 @@ document.addEventListener('DOMContentLoaded', function() {
       recognition.lang = 'en-US';
 
       recognition.onstart = function() {
+        speakMessage("What's up cutie patootie?")
         output.textContent = 'Listening...';
+        
       };
 
       recognition.onresult = function(event) {
@@ -99,20 +101,24 @@ document.addEventListener('DOMContentLoaded', function() {
           'Authorization': 'Bearer ' + apiKey
         },
         body: JSON.stringify({
-          model: 'gpt-4o',
+          model: 'gpt-4',
           messages: [
             {
               role: 'system',
-              content: 'You are an assistant that organizes a daily schedule into calendar events. Return the response as JSON only, without any human text, in the following format: [{"Event Title": "", "Day": "YYYY-MM-DD", "StartTime": "", "EndTime": "", "Location": "", "Description": "", "Reminder": ""}].'
+              content: `
+                I'm currently in making a timetable ai application that communicates with chatgpt api with the tasks I need to get done and a list of habits I have (e.g. if I usually am really sleepy in the morning, then you shouldn't assignment any difficult task in the morning unless you have to, or I usually work the most efficient between 3 pm to 5pm, then you should assign the most difficult tasks in that time). Please read my list of habits and my tasks I need to do and respond with actions of add, update, or delete depending on the user input to create a timetable. If the action is add, then it should return a json file in the format of Respond with JSON on[{"action":"add",”event":{"id":"","title":"","starttime":"","endtime":"","location":"","description":"","reminder":"","date":"","duration":"",focus":"","moveable":""}}]. If the action is move, then it should return a JSON response in the format of [{"action":"update", "event": {"id":"","title":"","starttime":"","endtime":"","location":"","description":"","reminder":"","date":"","duration":"",focus":"","moveable":""}}]. If the action is delete, then it should return a json formated response in the format of [{"action":"delete", "event": {"id":""}}]. It is okay to give more than one actions in one response if you see fit. For example, you can send back a JSON list of both move and add if you want to add a difficult task into a time the user is more productive in and move the less difficult task that used to be assigned during that time to another freed up time zone. You should have full judgement to see what events should be assigned at what time and whether it is appropriate to shift events around to fit the user's habits. You should evaluate the difficulty and nature of each task and match them with the user's habits. In your response, please add the start_time and end_time that you see fit, if location is not specified, then just output None for location, if the amount of minutes beforehand for the reminder is not specificied, then just default to 5 minutes. Please also give it a short and appropriate event name. Please evaluate how long it should take for each activity. For example, buying groceries would take 30 minutes to account for the traveling time costs, and studying for a final exam should be multiple sessions with breaks in the middle and the sum of these sessions shouldn't be too long so that it will burn the student out. Please think about many factors and result in a time cost to complete each activity. You should also assign a boolean value to Is_Focus depending on whether the activity is studying or not. For example, going to the supermarket would have a false value while studying for a quiz would be a true value. You should also assign a boolean value to Moveable, where you would analyse whether an activity is flexible to move or not. For example, an exam would not be moveable, a date wouldn’t be moveable, but breaks and studying periods would be moveable. Please also listen for any habits from the user that is related to making a time table. For example, a user saying he is most efficient at a certain time range is useful while a user saying he likes banana is not useful. When appropriate, also return JSON formated data in the format of [..., {"action":"Add_Habit", "Habit":""}]. If the user wishes to remove a habit, then it should return JSON in the format of [...,{"action": "Remove_Habit", "Habit":""}] where the Habit parameter holds existing habit to delete from the existing habit list.
+              `
             },
             {
               role: 'user',
-              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text. The format is [{"Event Title": "", "Day": "YYYY-MM-DD", "StartTime": "", "EndTime": "", "Location": "", "Description": "", "Reminder": ""}].`
+              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text.`
             }
           ],
           max_tokens: 200,
           temperature: 0.7
         })
+        
+        
       })
       .then(response => response.json())
       .then(data => {
@@ -134,6 +140,7 @@ document.addEventListener('DOMContentLoaded', function() {
               output.textContent = JSON.stringify(events, null, 2);
               
               insertEventsIntoDatabase(events);
+              output.textContent = JSON.stringify(events, null, 2);
             } else {
               throw new Error('No JSON found in the response');
             }
@@ -172,21 +179,59 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       if (data.success) {
         output.textContent = 'Events inserted successfully!';
-        speakMessage('You sexy beast! Events have been inserted successfully! Good job, sweetheart!');
+        // fetchChatGPTResponse('success');  // Get a success phrase from ChatGPT
       } else {
-        output.textContent = 'Error inserting events: ' + data.message;
-        speakMessage('There was an error inserting the events. Try again later, dear.');
+        output.textContent = error;
+        // fetchChatGPTResponse('failure');  // Get a failure phrase from ChatGPT
       }
     })
     .catch(error => {
       console.error('Error inserting events:', error);
       output.textContent = 'Error inserting events.';
-      speakMessage('There was an error inserting the events, honey. Please check the issue.');
+      fetchChatGPTResponse('failure');
     });
   }
   
+  // Function to fetch personalized responses from ChatGPT using OpenAI API
+  function fetchChatGPTResponse(status) {
+    let prompt;
+  
+    // Set the appropriate prompt based on the status
+    if (status === 'success') {
+      prompt = "Give me a fun, encouraging message to celebrate a successful event insertion.";
+    } else if (status === 'failure') {
+      prompt = "Provide a gentle, understanding message for when an event insertion fails.";
+    }
+  
+    // Make the API request to GPT-4
+    fetch('https://api.openai.com/v1/chat/completions', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer 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`
+      },
+      body: JSON.stringify({
+        model: 'gpt-4', // Ensure correct model is used
+        messages: [
+          { role: 'system', content: 'You are a helpful assistant that gives concise but somewhat flirty status updates based on events being added or removed.' },
+          { role: 'user', content: prompt }
+        ],
+        max_tokens: 50 // Limiting the response to 50 tokens
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      const message = data.choices[0].message.content.trim(); // Fetch the message from the response
+      speakMessage(message); // Call speakMessage with the generated response
+    })
+    .catch(error => {
+      console.error('Error fetching ChatGPT response:', error);
+      speakMessage("I'm sorry, there was an error retrieving the message."); // Fallback message in case of an error
+    });
+  }
+  
+  
   // Function to handle speaking the message
-  // Function to handle speaking the message using OpenAI TTS (Node.js backend)
   function speakMessage(message) {
     fetch('http://localhost:3000/generateSpeech', {
       method: 'POST',
@@ -211,6 +256,7 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Error fetching audio:', error);
       });
   }
+  
   const blockButton = document.getElementById('blockYouTubeAndCloseTabs');
 
   console.log('Block button:', blockButton);

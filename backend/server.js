@@ -26,43 +26,60 @@ const clientConfig = {
 };
 
 // Endpoint to handle event insertion
-app.post('/insertEvents', async (req, res) => {
+app.post('/insertEventsAndHabits', async (req, res) => {
   const events = req.body.events;
+  const habits = req.body.habits; // Assume habits are sent in the same request
 
   const client = new Client(clientConfig);
 
   try {
     await client.connect();
 
+    // Insert events into schedule_events table
     for (let event of events) {
       const query = `
-        INSERT INTO events (event_title, event_day, start_time, end_time, location, description, reminder)
-        VALUES ($1, $2, $3, $4, $5, $6, $7);
+        INSERT INTO schedule_events (title, event_date, start_time, end_time, location, description, reminder, duration, focus, moveable)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
       `;
       const values = [
-        event["Event Title"],
-        event["Day"],
-        event["StartTime"],
-        event["EndTime"],
-        event["Location"],
-        event["Description"],
-        event["Reminder"]
+        event["title"],
+        event["date"],
+        event["starttime"],
+        event["endtime"],
+        event["location"] || 'None', // Default to 'None' if location is empty
+        event["description"],
+        event["reminder"] || 5, // Default reminder to 5 if not specified
+        event["duration"],
+        event["focus"],
+        event["moveable"]
       ];
 
       await client.query(query, values);
-      console.log(`Inserted event: ${event["Event Title"]}`);
+      console.log(`Inserted event: ${event["title"]}`);
     }
 
-    // After successfully inserting, generate speech
-    const message = 'You sexy beast! Events have been inserted successfully! Good job, sweetheart!';
+    // Insert habits into user_habits table
+    if (habits && habits.length > 0) {
+      for (let habit of habits) {
+        const habitQuery = `
+          INSERT INTO user_habits (habit)
+          VALUES ($1);
+        `;
+        await client.query(habitQuery, [habit]);
+        console.log(`Inserted habit: ${habit}`);
+      }
+    }
+
+    // After successfully inserting, respond with success
     res.json({ success: true });
   } catch (err) {
-    console.error('Error inserting events:', err);
-    res.status(500).json({ success: false, message: 'Error inserting events' });
+    console.error('Error inserting events or habits:', err);
+    res.status(500).json({ success: false, message: 'Error inserting events or habits' });
   } finally {
     await client.end();
   }
 });
+
 
 // Endpoint to generate speech using OpenAI's TTS
 app.post('/generateSpeech', async (req, res) => {
