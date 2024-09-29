@@ -29,31 +29,47 @@ let acc; // Declare acc globally
 app.post('/insertEvents', async (req, res) => {
   const events = req.body.events;
   const client = new Client(clientConfig);
-  console.log(res)
+  console.log(events)
   try {
     await client.connect();
 
     for (let event of events) {
+      const eventData = event["event"]; // Access event details inside "event" object
+      
+      // Validate title and date fields
+      if (!eventData.title || !eventData.date) {
+        console.error(`Invalid event data: title or date missing`);
+        continue; // Skip this event if title or date is missing
+      }
+
       const query = `
-        INSERT INTO events (title, day, start_time, end_time, location, description, reminder)
-        VALUES ($1, $2, $3, $4, $5, $6, $7);
-        INSERT INTO events (title, day, start_time, end_time, location, description, reminder)
-        VALUES ($1, $2, $3, $4, $5, $6, $7);
+        INSERT INTO events (title, date, starttime, endtime, location, description, reminder, moveable, focus, duration)
+        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
       `;
+      
+      // Set default values for optional fields
       const values = [
-        event["title"],
-        event["day"],
-        event["start_time"],
-        event["end_time"],
-        event["location"],
-        event["description"],
-        event["reminder"]
+        eventData.title,
+        eventData.date,
+        eventData.starttime || '', // Default to empty string if missing
+        eventData.endtime || '',   // Default to empty string if missing
+        eventData.location || 'None', // Default to 'None' if missing
+        eventData.description || '',  // Default to empty string if missing
+        eventData.reminder || '5',    // Default reminder to '5' minutes
+        eventData.moveable || 'false', // Default to 'false' if missing
+        eventData.focus || 'low',      // Default focus level
+        eventData.duration || calculateDuration(eventData.starttime, eventData.endtime) // Calculate duration if missing
       ];
 
       acc = event["action"]; // Store the acc value globally
       console.log(acc);
 
-      await client.query(query, values);
+      try {
+        await client.query(query, values);
+        console.log(`Inserted event: ${eventData.title}`);
+      } catch (err) {
+        console.error(`Error inserting event: ${eventData.title}`, err);
+      }
     }
 
     res.json({ success: true });
@@ -104,7 +120,7 @@ app.post('/generateSpeech', async (req, res) => {
       method: 'POST',
       url: 'https://api.openai.com/v1/audio/speech',
       headers: {
-        'Authorization': `Bearer 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`,
+        'Authorization': `Bearer sk-wdxsrK_4zWn--bE2VzNf4u8lwNFtOGVbBlbIETa4T6T3BlbkFJNJC86X05vpheNRiKb_eNjdCiGzKynTaLnLeWgdwikA`,
         'Content-Type': 'application/json'
       },
       data: {

@@ -205,10 +205,10 @@ document.addEventListener('DOMContentLoaded', function() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + apiKey
+          'Authorization': 'Bearer sk-wdxsrK_4zWn--bE2VzNf4u8lwNFtOGVbBlbIETa4T6T3BlbkFJNJC86X05vpheNRiKb_eNjdCiGzKynTaLnLeWgdwikA'
         },
         body: JSON.stringify({
-          model: 'gpt-4',
+          model: 'gpt-4o',
           messages: [
             {
               role: 'system',
@@ -233,6 +233,7 @@ document.addEventListener('DOMContentLoaded', function() {
           max_tokens: 200,
           temperature: 0.7
         })
+        
         
       })
       .then(response => response.json())
@@ -277,14 +278,20 @@ document.addEventListener('DOMContentLoaded', function() {
  
   function insertEventsIntoDatabase(events) {
     events.forEach(event => {
-      // Check if the date is valid and can be parsed
-      // Check if the date is valid and can be parsed
-      const parsedDate = new Date(event["Day"]);
-      if (isNaN(parsedDate.getTime())) {
-        console.error(`Invalid date format: ${event["Day"]}`);
-        event["Day"] = null;  // Set to null or handle as needed
-      } else {
-        event["Day"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
+      if (event["event"]["date"]) {
+        const parsedDate = new Date(event["event"]["date"]);
+        if (isNaN(parsedDate.getTime())) {
+          console.error(`Invalid date format: ${event["event"]["date"]}`);
+          event["event"]["date"] = null;  // Set to null or handle as needed
+        } else {
+          event["event"]["date"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
+        }
+      }
+  
+      // Check if the title exists
+      if (!event["event"]["title"]) {
+        console.error("Title is missing for an event. Skipping insertion.");
+        return; // Skip if title is missing
       }
     });
      fetch('http://localhost:3000/insertEvents', {
@@ -296,6 +303,7 @@ document.addEventListener('DOMContentLoaded', function() {
     })
     .then(response => response.json())
     .then(data => {
+      console.log('Backend response:', data);
       if (data.success) {
         // output.textContent = 'Events inserted successfully!';
         speakMessage('You sexy beast! Events have been inserted successfully! Good job, sweetheart!');
