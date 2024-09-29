@@ -161,6 +161,25 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+
+     .event-actions {                  /*green checkmark box and red cross box */
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .event-actions button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    .event-actions .checkmark {
+      color: green;
+    }
+    .event-actions .cross {
+      color: red;
+    }
+
   </style>
 </head>
 <body>
@@ -172,5 +191,7 @@
   <ul id="upcomingEventsList" class="fade-in"></ul>
   <button id="blockYouTubeAndCloseTabs" class="fade-in">BLOCK DISTRACTIONS &#x1F6AB;</button>
   </div>
+  <script src="backend/punishment.js"></script>
+  <script src="backend/popup.js"></script>
 </body>
 </html>
