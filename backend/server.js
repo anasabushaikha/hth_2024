@@ -24,60 +24,83 @@ const clientConfig = {
 };
 
 // Endpoint to handle event and habit insertion
-app.post('/insertEventsAndHabits', async (req, res) => {
+let acc; // Declare acc globally
+
+// Update acc when inserting events
+app.post('/insertEvents', async (req, res) => {
   const events = req.body.events;
-  const habits = req.body.habits; // Assume habits are sent in the same request
-
   const client = new Client(clientConfig);
-
+  console.log(events)
   try {
     await client.connect();
 
-    // Insert events into schedule_events table
     for (let event of events) {
+      const eventData = event["event"]; // Access event details inside "event" object
+      
+      // Validate title and date fields
+      if (!eventData.title || !eventData.date) {
+        console.error(`Invalid event data: title or date missing`);
+        continue; // Skip this event if title or date is missing
+      }
+
       const query = `
-        INSERT INTO schedule_events (title, event_date, start_time, end_time, location, description, reminder, duration, focus, moveable)
+        INSERT INTO events (title, date, starttime, endtime, location, description, reminder, moveable, focus, duration)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
       `;
+      
+      // Set default values for optional fields
       const values = [
-        event["title"],
-        event["date"],
-        event["starttime"],
-        event["endtime"],
-        event["location"] || 'None', // Default to 'None' if location is empty
-        event["description"],
-        event["reminder"] || 5, // Default reminder to 5 if not specified
-        event["duration"],
-        event["focus"],
-        event["moveable"]
+        eventData.title,
+        eventData.date,
+        eventData.starttime || '', // Default to empty string if missing
+        eventData.endtime || '',   // Default to empty string if missing
+        eventData.location || 'None', // Default to 'None' if missing
+        eventData.description || '',  // Default to empty string if missing
+        eventData.reminder || '5',    // Default reminder to '5' minutes
+        eventData.moveable || 'false', // Default to 'false' if missing
+        eventData.focus || 'low',      // Default focus level
+        eventData.duration || calculateDuration(eventData.starttime, eventData.endtime) // Calculate duration if missing
       ];
 
-      await client.query(query, values);
-      console.log(`Inserted event: ${event["title"]}`);
-    }
+      acc = event["action"]; // Store the acc value globally
+      console.log(acc);
 
-    // Insert habits into user_habits table
-    if (habits && habits.length > 0) {
-      for (let habit of habits) {
-        const habitQuery = `
-          INSERT INTO user_habits (habit)
-          VALUES ($1);
-        `;
-        await client.query(habitQuery, [habit]);
-        console.log(`Inserted habit: ${habit}`);
+      try {
+        await client.query(query, values);
+        console.log(`Inserted event: ${eventData.title}`);
+      } catch (err) {
+        console.error(`Error inserting event: ${eventData.title}`, err);
       }
     }
 
-    // After successfully inserting, generate a message
-    const message = 'Events and habits have been inserted successfully!';
-    res.json({ success: true, message });
+    res.json({ success: true });
   } catch (err) {
-    console.error('Error inserting events or habits:', err);
-    res.status(500).json({ success: false, message: 'Error inserting events or habits' });
+    console.error('Error inserting events:', err);
+    res.status(500).json({ success: false, message: 'Error inserting events' });
   } finally {
     await client.end();
   }
 });
+
+// Helper function to calculate duration if it's not provided
+function calculateDuration(starttime, endtime) {
+  if (!starttime || !endtime) return '0';
+  const start = new Date(`1970-01-01T${starttime}:00`);
+  const end = new Date(`1970-01-01T${endtime}:00`);
+  const durationInMinutes = (end - start) / 60000;
+  return durationInMinutes.toString();
+}
+
+
+// Create a new API route to expose the acc value
+app.get('/getAcc', (req, res) => {
+  if (acc) {
+    res.json({ success: true, acc });
+  } else {
+    res.json({ success: false, message: 'No acc value found' });
+  }
+});
+
 
 // Endpoint to fetch events
 app.get('/getEvents', async (req, res) => {
@@ -106,7 +129,7 @@ app.post('/generateSpeech', async (req, res) => {
       method: 'POST',
       url: 'https://api.openai.com/v1/audio/speech',
       headers: {
-        'Authorization': `Bearer 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`,
+        'Authorization': `Bearer sk-wdxsrK_4zWn--bE2VzNf4u8lwNFtOGVbBlbIETa4T6T3BlbkFJNJC86X05vpheNRiKb_eNjdCiGzKynTaLnLeWgdwikA`,
         'Content-Type': 'application/json'
       },
       data: {

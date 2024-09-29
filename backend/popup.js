@@ -6,6 +6,50 @@ document.addEventListener('DOMContentLoaded', function() {
   const taskList = document.getElementById('taskList');
   let recognition;
   let wakeWordRecognition;
+  const upcomingEventsList = document.getElementById('upcomingEventsList');
+
+  // Function to fetch and display upcoming events
+  function fetchAndDisplayUpcomingEvents() {
+    fetch('http://localhost:3000/upcomingEvents')  // Correct endpoint
+      .then(response => {
+        console.log('Response:', response);  // Log the response
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Data:', data);  // Log the data
+        upcomingEventsList.innerHTML = ''; // Clear the list
+
+        if (data.success) {
+          const events = data.events;
+
+          if (events.length === 0) {
+            upcomingEventsList.innerHTML = '<li>No upcoming events.</li>';
+          } else {
+            events.forEach(event => {
+              const listItem = document.createElement('li');
+              listItem.textContent = `${event.title} at ${event.start_time}`;
+              upcomingEventsList.appendChild(listItem);
+            });
+          }
+        } else {
+          console.error('Error fetching upcoming events:', data.message);
+          upcomingEventsList.innerHTML = '<li>Error fetching upcoming events.</li>';
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching upcoming events:', error);
+        upcomingEventsList.innerHTML = '<li>Error fetching upcoming events.</li>';
+      });
+  }
+
+  // Call the function to fetch and display upcoming events
+  //fetchAndDisplayUpcomingEvents();
+
+
+  
 
   // Function to start the main recognition process
   function startMainRecognition() {
@@ -101,15 +145,20 @@ document.addEventListener('DOMContentLoaded', function() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + apiKey
+          'Authorization': 'Bearer sk-wdxsrK_4zWn--bE2VzNf4u8lwNFtOGVbBlbIETa4T6T3BlbkFJNJC86X05vpheNRiKb_eNjdCiGzKynTaLnLeWgdwikA'
         },
         body: JSON.stringify({
-          model: 'gpt-4',
+          model: 'gpt-4o',
           messages: [
             {
               role: 'system',
               content: `
-                I'm currently in making a timetable ai application that communicates with chatgpt api with the tasks I need to get done and a list of habits I have (e.g. if I usually am really sleepy in the morning, then you shouldn't assignment any difficult task in the morning unless you have to, or I usually work the most efficient between 3 pm to 5pm, then you should assign the most difficult tasks in that time). Please read my list of habits and my tasks I need to do and respond with actions of add, update, or delete depending on the user input to create a timetable. If the action is add, then it should return a json file in the format of Respond with JSON on[{"action":"add",”event":{"id":"","title":"","starttime":"","endtime":"","location":"","description":"","reminder":"","date":"","duration":"",focus":"","moveable":""}}]. If the action is move, then it should return a JSON response in the format of [{"action":"update", "event": {"id":"","title":"","starttime":"","endtime":"","location":"","description":"","reminder":"","date":"","duration":"",focus":"","moveable":""}}]. If the action is delete, then it should return a json formated response in the format of [{"action":"delete", "event": {"id":""}}]. It is okay to give more than one actions in one response if you see fit. For example, you can send back a JSON list of both move and add if you want to add a difficult task into a time the user is more productive in and move the less difficult task that used to be assigned during that time to another freed up time zone. You should have full judgement to see what events should be assigned at what time and whether it is appropriate to shift events around to fit the user's habits. You should evaluate the difficulty and nature of each task and match them with the user's habits. In your response, please add the start_time and end_time that you see fit, if location is not specified, then just output None for location, if the amount of minutes beforehand for the reminder is not specificied, then just default to 5 minutes. Please also give it a short and appropriate event name. Please evaluate how long it should take for each activity. For example, buying groceries would take 30 minutes to account for the traveling time costs, and studying for a final exam should be multiple sessions with breaks in the middle and the sum of these sessions shouldn't be too long so that it will burn the student out. Please think about many factors and result in a time cost to complete each activity. You should also assign a boolean value to Is_Focus depending on whether the activity is studying or not. For example, going to the supermarket would have a false value while studying for a quiz would be a true value. You should also assign a boolean value to Moveable, where you would analyse whether an activity is flexible to move or not. For example, an exam would not be moveable, a date wouldn’t be moveable, but breaks and studying periods would be moveable. Please also listen for any habits from the user that is related to making a time table. For example, a user saying he is most efficient at a certain time range is useful while a user saying he likes banana is not useful. When appropriate, also return JSON formated data in the format of [..., {"action":"Add_Habit", "Habit":""}]. If the user wishes to remove a habit, then it should return JSON in the format of [...,{"action": "Remove_Habit", "Habit":""}] where the Habit parameter holds existing habit to delete from the existing habit list.
+                You are an assistant that organizes a daily schedule into calendar events based on the user's habits and task list. Analyze the difficulty and nature of tasks and assign them to appropriate times based on the user's productivity habits. Use the following logic for actions:
+                - If adding a new event, return JSON in the format [{"action":"add", "event": {"id":"", "title": "", "date": "YYYY-MM-DD", "starttime": "", "endtime": "", "location": "", "description": "", "reminder": "5", "focus": "", "moveable": "", "duration": ""}}]. Date can be today or tomorrow, in which case date will be string "Today" or string "Tomorrow"
+                - If moving an event, return JSON in the format [{"action":"update", "event": {"id":"", "title": "", "date": "YYYY-MM-DD", "starttime": "", "endtime": "", "location": "", "description": "", "reminder": "5", "focus": "", "moveable": "", "duration": ""}}].Date can be today or tomorrow, in which case date will be string "Today" or string "Tomorrow"
+                - If deleting an event, return JSON in the format [{"action":"delete", "event": {"id":""}}].
+                Evaluate time, focus, and moveability for each task. Assign a time cost, default location as "None", and reminder as 5 minutes if not specified. Date can be specified as "Today" or "Tomorrow" so get the date accordingly for the date attribute of the event JSON
+                If "duration" is not provided, calculate it as the difference between the "endtime" and "starttime".
               `
             },
             {
@@ -120,6 +169,8 @@ document.addEventListener('DOMContentLoaded', function() {
           max_tokens: 200,
           temperature: 0.7
         })
+        
+        
         
         
       })
@@ -144,8 +195,6 @@ document.addEventListener('DOMContentLoaded', function() {
               const jsonResponse = aiResponse.substring(jsonStart, jsonEnd);
               const events = JSON.parse(jsonResponse);  // Parse the JSON response
 
-              output.textContent = JSON.stringify(events, null, 2);
-              
               insertEventsIntoDatabase(events);
               output.textContent = JSON.stringify(events, null, 2);
             } else {
@@ -166,12 +215,20 @@ document.addEventListener('DOMContentLoaded', function() {
 
   function insertEventsIntoDatabase(events) {
     events.forEach(event => {
-      const parsedDate = new Date(event["Day"]);
-      if (isNaN(parsedDate.getTime())) {
-        console.error(`Invalid date format: ${event["Day"]}`);
-        event["Day"] = null;  // Set to null or handle as needed
-      } else {
-        event["Day"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
+      if (event["event"]["date"]) {
+        const parsedDate = new Date(event["event"]["date"]);
+        if (isNaN(parsedDate.getTime())) {
+          console.error(`Invalid date format: ${event["event"]["date"]}`);
+          event["event"]["date"] = null;  // Set to null or handle as needed
+        } else {
+          event["event"]["date"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
+        }
+      }
+  
+      // Check if the title exists
+      if (!event["event"]["title"]) {
+        console.error("Title is missing for an event. Skipping insertion.");
+        return; // Skip if title is missing
       }
     });
   
@@ -189,26 +246,20 @@ document.addEventListener('DOMContentLoaded', function() {
       return response.json();
     })
     .then(data => {
-      console.log('Backend response:', data);  // Log the response from backend
+      console.log('Backend response:', data);
       if (data.success) {
         output.textContent = 'Events inserted successfully!';
-        // fetchChatGPTResponse('success');  // Get a success phrase from ChatGPT
-        // Schedule reminders for the events (assuming scheduleReminders is defined elsewhere)
-        scheduleReminders(events);
-        fetchAndDisplayTasks(); // Refresh the task list
       } else {
         console.error('Backend Error:', data.message);
         output.textContent = 'Error inserting events: ' + data.message;
-        output.textContent = error;
-        // fetchChatGPTResponse('failure');  // Get a failure phrase from ChatGPT
       }
     })
     .catch(error => {
       console.error('Error inserting events:', error);
       output.textContent = 'Error inserting events.';
-      fetchChatGPTResponse('failure');
     });
   }
+  
   
   // Function to fetch personalized responses from ChatGPT using OpenAI API
   function fetchChatGPTResponse(status) {
@@ -226,7 +277,7 @@ document.addEventListener('DOMContentLoaded', function() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer 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`
+        'Authorization': `Bearer sk-wdxsrK_4zWn--bE2VzNf4u8lwNFtOGVbBlbIETa4T6T3BlbkFJNJC86X05vpheNRiKb_eNjdCiGzKynTaLnLeWgdwikA`
       },
       body: JSON.stringify({
         model: 'gpt-4', // Ensure correct model is used
@@ -304,7 +355,6 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     console.error('Block button or duration select not found');
   }
-  document.addEventListener('DOMContentLoaded', fetchAndDisplayTasks);
   
 });
 
@@ -338,6 +388,3 @@ document.addEventListener('DOMContentLoaded', function() {
   } else {
     console.error('Block button or duration select not found');
   }
-
-  // Call the function when the popup is opened
-  document.addEventListener('DOMContentLoaded', fetchAndDisplayTasks);

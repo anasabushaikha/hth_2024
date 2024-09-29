@@ -1,8 +1,29 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import './Navbar.css';
+import axios from 'axios';
 
 const Navbar = () => {
+  const [acc, setAcc] = useState(null);
+
+  useEffect(() => {
+    // Fetch the acc value from the server
+    const fetchAcc = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/getAcc');
+        if (response.data.success) {
+          setAcc(response.data.acc);
+        } else {
+          console.error(response.data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching acc:', error);
+      }
+    };
+
+    fetchAcc();
+  }, []);
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
@@ -24,6 +45,11 @@ const Navbar = () => {
             </Link>
           </li>
         </ul>
+        {acc && (
+          <div className="acc-display">
+            <span>Action: {acc}</span>
+          </div>
+        )}
       </div>
     </nav>
   );
