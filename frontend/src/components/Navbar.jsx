@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { useTaskStore } from '../store/product';  // Import useTaskStore
+import { useTaskStore } from '../store/product';
+import { triggerGlobalAIHandler } from '../utils/globalFunctions';
 import './Navbar.css';
 import axios from 'axios';
 
@@ -73,6 +74,5 @@ const Navbar = () => {
     </nav>
   );
 };
-
 
 export default Navbar;

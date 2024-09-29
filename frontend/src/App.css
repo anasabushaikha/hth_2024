@@ -581,3 +581,26 @@ h1, h2 {
   /* ... (keep other styles for day-header) ... */
   border-bottom: 1px solid #4682B4; /* Change to 1px to match the grid line */
 }
+
+@keyframes fancyNewTaskAnimation {
+  0% {
+    transform: scale(0) rotate(180deg);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.2) rotate(-20deg);
+    opacity: 0.5;
+  }
+  75% {
+    transform: scale(0.9) rotate(10deg);
+    opacity: 0.75;
+  }
+  100% {
+    transform: scale(1) rotate(0);
+    opacity: 1;
+  }
+}
+
+.fancy-new-task {
+  animation: fancyNewTaskAnimation 0.8s ease-out;
+}
