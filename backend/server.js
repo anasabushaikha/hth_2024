@@ -170,12 +170,19 @@ app.get('/events', async (req, res) => {
 // DELETE to handle event deletion
 app.delete('/deleteEvent/:id', async (req, res) => {
   const eventId = req.params.id;
+  const client = new Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'hth-project',
+    password: 'postgres',
+    port: 5432,
+  });
 
   try {
     await client.connect();
-    const query = 'DELETE FROM events WHERE id = $1';
+    const query = `DELETE FROM events WHERE id = $1;`;
     await client.query(query, [eventId]);
-    res.json({ success: true });
+    res.json({ success: true, message: 'Event deleted successfully' });
   } catch (err) {
     console.error('Error deleting event:', err);
     res.status(500).json({ success: false, message: 'Error deleting event' });

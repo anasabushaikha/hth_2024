@@ -1,12 +1,11 @@
+
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM content loaded');
 
-  const startButton = document.getElementById('startListening');
   const output = document.getElementById('output');
-  const taskList = document.getElementById('taskList');
-  const upcomingEventsList = document.getElementById('upcomingEventsList'); // Ensure this element is selected
-  let wakeWordRecognition;
   let recognition;
+  let wakeWordRecognition;
+  const upcomingEventsList = document.getElementById('upcomingEventsList');
 
   // Function to fetch and display upcoming events
   function fetchAndDisplayUpcomingEvents() {
@@ -25,13 +24,25 @@ document.addEventListener('DOMContentLoaded', function() {
         if (data.success) {
           const events = data.events;
 
+          // Sort events by date and time
+          events.sort((a, b) => new Date(a.date) - new Date(b.date));
+
           if (events.length === 0) {
             upcomingEventsList.innerHTML = '<li>No upcoming events.</li>';
           } else {
-            events.forEach(event => {
+            events.forEach((event, index) => {
               const listItem = document.createElement('li');
               const formattedDate = new Date(event.date).toLocaleDateString();
-              listItem.textContent = `${event.title} in ${event.location} at ${event.endtime} on ${formattedDate}`;
+              
+              // Adjust size based on index (earliest event gets larger size)
+              const size = 20 - index; // Adjust size decrementally
+              listItem.style.fontSize = `${size > 10 ? size : 10}px`; // Minimum size of 10px
+
+              listItem.innerHTML = `${event.title} in ${event.location} at ${event.endtime} on ${formattedDate}
+                <div class="event-actions">
+                  <button class="tickMark" data-id="${event.id}">✔️</button>
+                  <button class="crossMark" data-id="${event.id}">❌</button>
+                </div>`;
               upcomingEventsList.appendChild(listItem);
             });
           }
@@ -56,11 +67,13 @@ document.addEventListener('DOMContentLoaded', function() {
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = 'en-US';
-
+ 
+ 
       recognition.onstart = function() {
         output.textContent = 'Listening...';
       };
-
+ 
+ 
       recognition.onresult = function(event) {
         const spokenText = event.results[0][0].transcript;
         output.textContent = 'Processing command...';
@@ -68,22 +81,26 @@ document.addEventListener('DOMContentLoaded', function() {
         // Pass the spoken text directly to ChatGPT
         processCommand(spokenText);
       };
-
+ 
+ 
       recognition.onerror = function(event) {
         output.textContent = 'Error occurred in recognition: ' + event.error;
       };
-
+ 
+ 
       recognition.onend = function() {
         // Restart the wake word recognition after the main recognition ends
         startWakeWordRecognition();
       };
-
+ 
+ 
       recognition.start();
     } else {
       output.textContent = 'Web Speech API is not supported in this browser.';
     }
   }
-
+ 
+ 
   // Function to start listening for the wake word "Hey Mommy"
   function startWakeWordRecognition() {
     if ('webkitSpeechRecognition' in window) {
@@ -91,36 +108,43 @@ document.addEventListener('DOMContentLoaded', function() {
       wakeWordRecognition.continuous = true;
       wakeWordRecognition.interimResults = false;
       wakeWordRecognition.lang = 'en-US';
-
+ 
+ 
       wakeWordRecognition.onstart = function() {
         output.textContent = 'Listening for wake word...';
       };
-
+ 
+ 
       wakeWordRecognition.onresult = function(event) {
         const wakeWord = event.results[0][0].transcript.trim().toLowerCase();
-
-        if (wakeWord === 'hey mommy') {
-          output.textContent = 'Wake word detected: "Hey Mommy"';
-
+ 
+ 
+        if (wakeWord === 'hello world') {
+          output.textContent = 'Wake word detected: "Hello World"';
+ 
+ 
           // Stop wake word recognition and start the main recognition
           wakeWordRecognition.stop();
           startMainRecognition();
         }
       };
-
+ 
+ 
       wakeWordRecognition.onerror = function(event) {
         output.textContent = 'Error occurred in wake word recognition: ' + event.error;
       };
-
+ 
+ 
       wakeWordRecognition.start();
     } else {
       output.textContent = 'Web Speech API is not supported in this browser.';
     }
   }
-
+ 
+ 
   // Call this function initially to start listening for the wake word
   startWakeWordRecognition();
-
+ 
   function processCommand(command) {
     chrome.storage.local.get(['openaiApiKey'], function(result) {
       const apiKey = result.openaiApiKey;
@@ -129,7 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
         output.textContent = 'API key not set.';
         return;
       }
-
+  
       fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -157,16 +181,17 @@ document.addEventListener('DOMContentLoaded', function() {
           max_tokens: 200,
           temperature: 0.7
         })
-        
       })
       .then(response => response.json())
       .then(data => {
+        console.log('OpenAI API Response:', data);  // Log the full response
+  
         if (data.error) {
           console.error('OpenAI API Error:', data.error);
           output.textContent = 'Error processing the command.';
         } else {
           const aiResponse = data.choices[0].message.content.trim();
-
+  
           // Try to sanitize and parse the response to ensure valid JSON
           try {
             const jsonStart = aiResponse.indexOf('[');
@@ -174,28 +199,29 @@ document.addEventListener('DOMContentLoaded', function() {
             if (jsonStart !== -1 && jsonEnd !== -1) {
               const jsonResponse = aiResponse.substring(jsonStart, jsonEnd);
               const events = JSON.parse(jsonResponse);  // Parse the JSON response
-
+  
               output.textContent = JSON.stringify(events, null, 2);
-              
               insertEventsIntoDatabase(events);
             } else {
               throw new Error('No JSON found in the response');
             }
           } catch (error) {
             console.error('JSON Parse Error:', error);
-            //output.textContent = 'Error parsing JSON response.';
+            output.textContent = 'Error parsing JSON response.';
           }
         }
       })
       .catch(error => {
         console.error('Fetch Error:', error);
-        // output.textContent = 'Error communicating with the AI service.';
+        output.textContent = 'Error communicating with the AI service.';
       });
     });
   }
-
+ 
+ 
   function insertEventsIntoDatabase(events) {
     events.forEach(event => {
+      // Check if the date is valid and can be parsed
       // Check if the date is valid and can be parsed
       const parsedDate = new Date(event["Day"]);
       if (isNaN(parsedDate.getTime())) {
@@ -205,8 +231,7 @@ document.addEventListener('DOMContentLoaded', function() {
         event["Day"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
       }
     });
-  
-    fetch('http://localhost:3000/insertEvents', {
+     fetch('http://localhost:3000/insertEvents', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -217,14 +242,20 @@ document.addEventListener('DOMContentLoaded', function() {
     .then(data => {
       if (data.success) {
         // output.textContent = 'Events inserted successfully!';
-        speakMessage('You sexy beast! Events have been inserted successfully! Good job, sweetheart!');
+        speakMessage(' Events have been inserted successfully! Good job, sweetheart!');
+        // output.textContent = 'Events inserted successfully!';
+        speakMessage(' Events have been inserted successfully! Good job, sweetheart!');
       } else {
+        // output.textContent = 'Error inserting events: ' + data.message;
+        speakMessage('There was an error inserting the events. Try again later, dear.');
         // output.textContent = 'Error inserting events: ' + data.message;
         speakMessage('There was an error inserting the events. Try again later, dear.');
       }
     })
     .catch(error => {
       console.error('Error inserting events:', error);
+      // output.textContent = 'Error inserting events.';
+      speakMessage('There was an error inserting the events, honey. Please check the issue.');
       // output.textContent = 'Error inserting events.';
       speakMessage('There was an error inserting the events, honey. Please check the issue.');
     });
@@ -256,5 +287,81 @@ document.addEventListener('DOMContentLoaded', function() {
         console.error('Error fetching audio:', error);
       });
   }
+
+  function speakMessage(message) {
+    const profileImage = document.getElementById('profileImage');
+    profileImage.classList.add('talking');
+
+    fetch('http://localhost:3000/generateSpeech', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error generating speech');
+        }
+        return response.blob();
+      })
+      .then(audioBlob => {
+        const audioURL = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioURL);
+
+        audio.onended = () => {
+          profileImage.classList.remove('talking');
+        };
+
+        audio.play();
+      })
+      .catch(error => {
+        console.error('Error fetching audio:', error);
+        profileImage.classList.remove('talking');
+      });
+  }
+
+  // Function to delete an event
+  async function deleteEvent(eventId) {
+    try {
+      const response = await fetch(`http://localhost:3000/deleteEvent/${eventId}`, {
+        method: 'DELETE',
+      });
+      const data = await response.json();
+      if (data.success) {
+        speakMessage('Event deleted successfully.');
+      } else {
+        speakMessage('Error deleting event: ' + data.message);
+      }
+    } catch (error) {
+      console.error('Error deleting event:', error);
+      speakMessage('Error deleting event.');
+    }
+  }
+
+  // Event delegation for tick and cross marks
+  document.addEventListener('click', async function(event) {
+    if (event.target.classList.contains('tickMark')) {
+      const eventId = event.target.getAttribute('data-id');
+      const userConfirmed = confirm('Are you sure you want to delete this event? Ok or Cancel');
+      if (userConfirmed) {
+        await deleteEvent(eventId);
+        fetchAndDisplayUpcomingEvents(); // Refresh events after deletion
+      } else {
+        speakMessage('Event deletion canceled.');
+      }
+    }
+
+    if (event.target.classList.contains('crossMark')) {
+      const eventId = event.target.getAttribute('data-id');
+      const userConfirmed = confirm('Punishment has been triggered!!!');
+      if (userConfirmed) {
+        await deleteEvent(eventId);
+        fetchAndDisplayUpcomingEvents(); // Refresh events after deletion
+      } else {
+        alert('Punishment canceled.');
+      }
+    }
+  });
 
 });

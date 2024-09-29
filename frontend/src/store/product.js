@@ -1,53 +1,90 @@
-import { create } from 'zustand'
+import { create } from 'zustand';
+import { useEffect } from 'react';
 
-const generateId = () => Math.random().toString(36).substr(2, 9)
+const generateId = () => Math.random().toString(36).substr(2, 9);
 
-const initialTasks = [
-  { id: generateId(), title: 'Weekend Brunch', duration: 90, startTime: '10:30', date: '2024-09-28' },
-  { id: generateId(), title: 'Grocery Shopping', duration: 60, startTime: '14:00', date: '2024-09-28' },
-  { id: generateId(), title: 'Movie Night', duration: 120, startTime: '20:00', date: '2024-09-28' },
-  { id: generateId(), title: 'Morning Jog', duration: 45, startTime: '07:00', date: '2024-09-29' },
-  { id: generateId(), title: 'Family Lunch', duration: 120, startTime: '13:00', date: '2024-09-29' },
-  { id: generateId(), title: 'Book Club Meeting', duration: 90, startTime: '18:30', date: '2024-09-29' },
-  { id: generateId(), title: 'Team Standup', duration: 30, startTime: '09:00', date: '2024-09-30' },
-  { id: generateId(), title: 'Project Presentation', duration: 60, startTime: '14:00', date: '2024-09-30' },
-  { id: generateId(), title: 'Yoga Class', duration: 75, startTime: '18:00', date: '2024-09-30' },
-  { id: generateId(), title: 'Dentist Appointment', duration: 60, startTime: '11:00', date: '2024-10-01' },
-  { id: generateId(), title: 'Lunch with Client', duration: 90, startTime: '13:30', date: '2024-10-01' },
-  { id: generateId(), title: 'Evening Webinar', duration: 120, startTime: '19:00', date: '2024-10-01' },
-  { id: generateId(), title: 'Gym Session', duration: 60, startTime: '07:30', date: '2024-10-02' },
-  { id: generateId(), title: 'Team Building Activity', duration: 180, startTime: '13:00', date: '2024-10-02' },
-  { id: generateId(), title: 'Online Course', duration: 90, startTime: '20:00', date: '2024-10-02' },
-  { id: generateId(), title: 'Quarterly Review', duration: 120, startTime: '10:00', date: '2024-10-03' },
-  { id: generateId(), title: 'Lunch Break', duration: 60, startTime: '13:00', date: '2024-10-03' },
-  { id: generateId(), title: 'Happy Hour with Colleagues', duration: 120, startTime: '18:00', date: '2024-10-03' },
-  { id: generateId(), title: 'Morning Meditation', duration: 30, startTime: '07:00', date: '2024-10-04' },
-  { id: generateId(), title: 'Project Deadline', duration: 240, startTime: '09:00', date: '2024-10-04' },
-  { id: generateId(), title: 'Farewell Party', duration: 180, startTime: '18:00', date: '2024-10-04' }
-]
+export const useTaskStore = create((set) => {
+  console.log('Initializing useTaskStore');
+  return {
+    tasks: [],
+    setTasks: (tasks) => {
+      set({ tasks });
+    },
+    addTask: (newTask) => {
+      const taskWithId = { ...newTask, id: generateId() };
+      set((state) => {
+        const newTasks = [...state.tasks, taskWithId];
+        return { tasks: newTasks };
+      });
+      return { success: true, message: 'Task added successfully' };
+    },
+    deleteTask: (taskId) => {
+      set((state) => {
+        const newTasks = state.tasks.filter((task) => task.id !== taskId);
+        return { tasks: newTasks };
+      });
+      return { success: true, message: 'Task deleted successfully' };
+    },
+    updateTask: (taskId, updatedTask) => {
+      console.log('Task ID: ', taskId);
+      set((state) => {
+        const newTasks = state.tasks.map((task) =>
+          task.id === taskId ? { ...task, ...updatedTask } : task
+        );
+        console.log('New state after update:', newTasks);
+        return { tasks: newTasks };
+      });
 
-const useTaskStore = create((set) => ({
-  tasks: initialTasks,
-  setTasks: (tasks) => set({ tasks }),
-  addTask: (newTask) => {
-    const taskWithId = { ...newTask, id: generateId() }
-    set((state) => ({
-      tasks: [...state.tasks, taskWithId],
-    }))
-    return { success: true, message: 'Task added successfully' }
-  },
-  deleteTask: (taskId) => {
-    set((state) => ({
-      tasks: state.tasks.filter((task) => task.id !== taskId),
-    }))
-    return { success: true, message: 'Task deleted successfully' }
-  },
-  updateTask: (taskId, updatedTask) => {
-    set((state) => ({
-      tasks: state.tasks.map((task) => (task.id === taskId ? { ...task, ...updatedTask } : task)),
-    }))
-    return { success: true, message: 'Task updated successfully' }
-  },
-}))
+      console.log('State after set:', useTaskStore.getState().tasks);
+      return { success: true, message: 'Task updated successfully' };
+    },
+  };
+});
 
-export default useTaskStore
+// Custom hook to fetch tasks (without using axios)
+export const useFetchTasks = () => {
+  const { tasks, setTasks } = useTaskStore();
+
+  useEffect(() => {
+    const fetchTasks = async () => {
+      try {
+        // Here, you'd replace this with your own logic to fetch tasks, 
+        // such as using `fetch` or other methods to get the data.
+        const mockResponse = [
+          {
+            id: '1',
+            title: 'Task 1',
+            duration: 120,
+            starttime: '10:00',
+            date: '2023-09-29',
+          },
+          {
+            id: '2',
+            title: 'Task 2',
+            duration: 60,
+            starttime: '12:00',
+            date: '2023-09-30',
+          },
+        ];
+
+        const fetchedEvents = mockResponse.map((event) => ({
+          id: event.id,
+          title: event.title || 'Untitled', // Ensure title is a string
+          duration: event.duration || 0, // Ensure duration is a number
+          startTime: event.starttime || '00:00', // Ensure startTime is formatted correctly
+          date: new Date(event.date).toISOString().split('T')[0], // Handle date parsing
+        }));
+
+        setTasks(fetchedEvents);
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    fetchTasks();
+  }, [setTasks]);
+
+  return tasks;
+};
+
+export default useTaskStore;
