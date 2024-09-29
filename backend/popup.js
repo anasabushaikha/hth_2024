@@ -112,11 +112,13 @@ document.addEventListener('DOMContentLoaded', function() {
       recognition.continuous = false;
       recognition.interimResults = false;
       recognition.lang = 'en-US';
-
+ 
+ 
       recognition.onstart = function() {
         output.textContent = 'Listening...';
       };
-
+ 
+ 
       recognition.onresult = function(event) {
         const spokenText = event.results[0][0].transcript;
         output.textContent = 'Processing command...';
@@ -124,22 +126,26 @@ document.addEventListener('DOMContentLoaded', function() {
         // Pass the spoken text directly to ChatGPT
         processCommand(spokenText);
       };
-
+ 
+ 
       recognition.onerror = function(event) {
         output.textContent = 'Error occurred in recognition: ' + event.error;
       };
-
+ 
+ 
       recognition.onend = function() {
         // Restart the wake word recognition after the main recognition ends
         startWakeWordRecognition();
       };
-
+ 
+ 
       recognition.start();
     } else {
       output.textContent = 'Web Speech API is not supported in this browser.';
     }
   }
-
+ 
+ 
   // Function to start listening for the wake word "Hey Mommy"
   function startWakeWordRecognition() {
     if ('webkitSpeechRecognition' in window) {
@@ -147,36 +153,44 @@ document.addEventListener('DOMContentLoaded', function() {
       wakeWordRecognition.continuous = true;
       wakeWordRecognition.interimResults = false;
       wakeWordRecognition.lang = 'en-US';
-
+ 
+ 
       wakeWordRecognition.onstart = function() {
         output.textContent = 'Listening for wake word...';
       };
-
+ 
+ 
       wakeWordRecognition.onresult = function(event) {
         const wakeWord = event.results[0][0].transcript.trim().toLowerCase();
-
+ 
+ 
         if (wakeWord === 'hey mommy') {
           output.textContent = 'Wake word detected: "Hey Mommy"';
-
+ 
+ 
           // Stop wake word recognition and start the main recognition
           wakeWordRecognition.stop();
           startMainRecognition();
         }
       };
-
+ 
+ 
       wakeWordRecognition.onerror = function(event) {
         output.textContent = 'Error occurred in wake word recognition: ' + event.error;
       };
-
+ 
+ 
       wakeWordRecognition.start();
     } else {
       output.textContent = 'Web Speech API is not supported in this browser.';
     }
   }
-
+ 
+ 
   // Call this function initially to start listening for the wake word
   startWakeWordRecognition();
-
+ 
+ 
   function processCommand(command) {
     chrome.storage.local.get(['openaiApiKey'], function(result) {
       const apiKey = result.openaiApiKey;
@@ -185,7 +199,8 @@ document.addEventListener('DOMContentLoaded', function() {
         output.textContent = 'API key not set.';
         return;
       }
-
+ 
+ 
       fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -198,6 +213,11 @@ document.addEventListener('DOMContentLoaded', function() {
             {
               role: 'system',
               content: `
+                You are an assistant that organizes a daily schedule into calendar events based on the user's habits and task list. Analyze the difficulty and nature of tasks and assign them to appropriate times based on the user's productivity habits. Use the following logic for actions:
+                - If adding a new event, return JSON in the format [{"action":"add", "event": {"id":"", "title": "", "day": "", "start_time": "", "end_time": "", "location": "", "description": "", "reminder": "5", "focus": "", "moveable": ""}}].
+                - If moving an event, return JSON in the format [{"action":"update", "event": {"id":"", "title": "", "day": "", "start_time": "", "end_time": "", "location": "", "description": "", "reminder": "5", "focus": "", "moveable": ""}}].
+                - If deleting an event, return JSON in the format [{"action":"delete", "event": {"id":""}}].
+                Evaluate time, focus, and moveability for each task. Assign a time cost, default location as "None", and reminder as 5 minutes if not specified.
                 You are an assistant that organizes a daily schedule into calendar events based on the user's habits and task list. Analyze the difficulty and nature of tasks and assign them to appropriate times based on the user's productivity habits. Use the following logic for actions:
                 - If adding a new event, return JSON in the format [{"action":"add", "event": {"id":"", "title": "", "day": "", "start_time": "", "end_time": "", "location": "", "description": "", "reminder": "5", "focus": "", "moveable": ""}}].
                 - If moving an event, return JSON in the format [{"action":"update", "event": {"id":"", "title": "", "day": "", "start_time": "", "end_time": "", "location": "", "description": "", "reminder": "5", "focus": "", "moveable": ""}}].
@@ -222,7 +242,8 @@ document.addEventListener('DOMContentLoaded', function() {
           output.textContent = 'Error processing the command.';
         } else {
           const aiResponse = data.choices[0].message.content.trim();
-
+ 
+ 
           // Try to sanitize and parse the response to ensure valid JSON
           try {
             const jsonStart = aiResponse.indexOf('[');
@@ -230,9 +251,10 @@ document.addEventListener('DOMContentLoaded', function() {
             if (jsonStart !== -1 && jsonEnd !== -1) {
               const jsonResponse = aiResponse.substring(jsonStart, jsonEnd);
               const events = JSON.parse(jsonResponse);  // Parse the JSON response
-
+ 
+ 
               output.textContent = JSON.stringify(events, null, 2);
-              
+             
               insertEventsIntoDatabase(events);
             } else {
               throw new Error('No JSON found in the response');
@@ -240,18 +262,22 @@ document.addEventListener('DOMContentLoaded', function() {
           } catch (error) {
             console.error('JSON Parse Error:', error);
             //output.textContent = 'Error parsing JSON response.';
+            //output.textContent = 'Error parsing JSON response.';
           }
         }
       })
       .catch(error => {
         console.error('Fetch Error:', error);
         // output.textContent = 'Error communicating with the AI service.';
+        // output.textContent = 'Error communicating with the AI service.';
       });
     });
   }
-
+ 
+ 
   function insertEventsIntoDatabase(events) {
     events.forEach(event => {
+      // Check if the date is valid and can be parsed
       // Check if the date is valid and can be parsed
       const parsedDate = new Date(event["Day"]);
       if (isNaN(parsedDate.getTime())) {
@@ -261,8 +287,7 @@ document.addEventListener('DOMContentLoaded', function() {
         event["Day"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
       }
     });
-  
-    fetch('http://localhost:3000/insertEvents', {
+     fetch('http://localhost:3000/insertEvents', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -274,13 +299,19 @@ document.addEventListener('DOMContentLoaded', function() {
       if (data.success) {
         // output.textContent = 'Events inserted successfully!';
         speakMessage('You sexy beast! Events have been inserted successfully! Good job, sweetheart!');
+        // output.textContent = 'Events inserted successfully!';
+        speakMessage('You sexy beast! Events have been inserted successfully! Good job, sweetheart!');
       } else {
+        // output.textContent = 'Error inserting events: ' + data.message;
+        speakMessage('There was an error inserting the events. Try again later, dear.');
         // output.textContent = 'Error inserting events: ' + data.message;
         speakMessage('There was an error inserting the events. Try again later, dear.');
       }
     })
     .catch(error => {
       console.error('Error inserting events:', error);
+      // output.textContent = 'Error inserting events.';
+      speakMessage('There was an error inserting the events, honey. Please check the issue.');
       // output.textContent = 'Error inserting events.';
       speakMessage('There was an error inserting the events, honey. Please check the issue.');
     });

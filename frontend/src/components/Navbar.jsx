@@ -1,16 +1,14 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTaskStore } from '../store/product';  // Import useTaskStore
+import { useTaskStore } from '../store/product';  // Import useTaskStore
 import './Navbar.css';
-
 
 const Navbar = ({ handleAIInput }) => {
   const { deleteTask } = useTaskStore();  // Get deleteTask function from the store
 
-
   const handleAIButtonClick = () => {
     if (handleAIInput) {
-
 
       const exampleAIInput = [
         {
@@ -35,7 +33,6 @@ const Navbar = ({ handleAIInput }) => {
       console.error('handleAIInput is not available');
     }
   };
-
 
   const handleUpdateTasks = () => {
     console.log('Updating tasks...');
@@ -64,12 +61,10 @@ const Navbar = ({ handleAIInput }) => {
     }
   };
 
-
   const handleDeleteTask1 = () => {
     deleteTask("1");  // Delete task with id "1"
     console.log('Deleted task with id 1');
   };
-
 
   return (
     <nav className="navbar">

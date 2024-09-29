@@ -247,12 +247,10 @@
   }
 }
 
-
 .time-column,
 .day-column {
   padding-top: 60px; /* Add padding to align with the shifted grid */
 }
-
 
 .day-header {
   position: absolute;
@@ -274,24 +272,20 @@
   border-radius: 0 0 15px 15px;
 }
 
-
 .day-header:hover {
   transform: translateY(-2px);
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
   /* Removed the background-color change */
 }
 
-
 .day-tasks {
   position: relative;
 }
-
 
 .task-item {
   /* Existing styles */
   top: calc(var(--top) + 60px); /* Adjust the top position to account for the shift */
 }
-
 
 @keyframes popIn {
   0% {
@@ -308,11 +302,9 @@
   }
 }
 
-
 .task-item.new-task {
   animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
 }
-
 
 @keyframes fadeOut {
   0% {
@@ -324,7 +316,6 @@
     transform: scale(0.8);
   }
 }
-
 
 .task-item.deleting {
   animation: fadeOut 0.5s ease-out forwards;

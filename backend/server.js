@@ -29,12 +29,14 @@ let acc; // Declare acc globally
 app.post('/insertEvents', async (req, res) => {
   const events = req.body.events;
   const client = new Client(clientConfig);
-
+  console.log(res)
   try {
     await client.connect();
 
     for (let event of events) {
       const query = `
+        INSERT INTO events (title, day, start_time, end_time, location, description, reminder)
+        VALUES ($1, $2, $3, $4, $5, $6, $7);
         INSERT INTO events (title, day, start_time, end_time, location, description, reminder)
         VALUES ($1, $2, $3, $4, $5, $6, $7);
       `;
@@ -56,6 +58,8 @@ app.post('/insertEvents', async (req, res) => {
 
     res.json({ success: true });
   } catch (err) {
+    console.error('Error inserting events:', err);
+    res.status(500).json({ success: false, message: 'Error inserting events' });
     console.error('Error inserting events:', err);
     res.status(500).json({ success: false, message: 'Error inserting events' });
   } finally {

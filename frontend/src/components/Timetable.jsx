@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {useTaskStore, useFetchTasks} from '../store/product'
 import axios from 'axios'
+import axios from 'axios'
 import './Timetable.css'
 
 
@@ -155,10 +156,9 @@ const TaskModal = ({ task, onClose, onDelete }) => {
   )
 }
 
-
 const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek, onAIInput }) => {
   const { tasks, addTask, deleteTask, updateTask } = useTaskStore()
- 
+  
   // Add this console.log
   const [selectedTask, setSelectedTask] = useState(null)
 
@@ -301,7 +301,6 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek, onAIInput }) =
     };
     return date.toLocaleDateString('en-US', options);
   }
-
 
   const hourHeight = 60; // Height of each hour slot in pixels
   return (

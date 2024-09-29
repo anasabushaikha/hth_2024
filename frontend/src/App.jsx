@@ -15,9 +15,7 @@ function App() {
     return today
   })
 
-
   const { addTask, updateTask, deleteTask } = useTaskStore()
-
 
   const goToPreviousWeek = () => {
     setCurrentDate(prevDate => {
@@ -35,7 +33,6 @@ function App() {
       return newDate
     })
   }
-
 
   const handleAIInput = (aiInput) => {
     aiInput.forEach(item => {
@@ -63,7 +60,6 @@ function App() {
       }
     });
   }
-
 
   return (
     <div className="app">

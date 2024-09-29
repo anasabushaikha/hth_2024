@@ -109,7 +109,6 @@
   color: #FFD700; /* Changed to gold color on hover */
 }
 
-
 .ai-button {
   background-color: #4CAF50;
   border: none;
@@ -125,11 +124,9 @@
   border-radius: 12px;
 }
 
-
 .ai-button:hover {
   background-color: #45a049;
 }
-
 
 .update-tasks-button {
   background-color: #4a69bd;
@@ -146,11 +143,9 @@
   border-radius: 12px;
 }
 
-
 .update-tasks-button:hover {
   background-color: #1e3799;
 }
-
 
 .delete-task-button {
   /* Add any specific styles for the delete button here */
@@ -158,11 +153,9 @@
   color: white;
 }
 
-
 .delete-task-button:hover {
   background-color: #ff4757;  /* A slightly darker red on hover */
 }
-
 
 @media screen and (max-width: 960px) {
   .navbar-container {

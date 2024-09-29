@@ -5,7 +5,6 @@ import axios from 'axios';
 
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
-
 export const useTaskStore = create((set) => {
   console.log('Initializing useTaskStore');
   return {
@@ -38,13 +37,11 @@ export const useTaskStore = create((set) => {
         return { tasks: newTasks };
       });
 
-
       console.log('State after set:', useTaskStore.getState().tasks);
       return { success: true, message: 'Task updated successfully' };
     },
   };
 });
-
 
 // Custom hook to fetch tasks from the server
 export const useFetchTasks = () => {
