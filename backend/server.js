@@ -184,6 +184,36 @@ app.delete('/deleteEvent/:id', async (req, res) => {
   }
 });
 
+// Endpoint to fetch upcoming events
+app.get('/upcomingEvents', async (req, res) => {
+  const client = new Client(clientConfig);
+
+  try {
+    await client.connect();
+    // SQL query to fetch upcoming events based on current date and time
+    const result = await client.query(`
+      SELECT * FROM public.events
+      WHERE (date > CURRENT_DATE)
+      OR (date = CURRENT_DATE AND endtime > CURRENT_TIME)
+      ORDER BY date, starttime;
+    `);
+
+    // Send result as JSON
+    res.json({
+      success: true,
+      events: result.rows,  // Ensure this is result.rows
+    });
+  } catch (err) {
+    console.error('Error fetching upcoming events:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error fetching upcoming events',
+    });
+  } finally {
+    await client.end();
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
