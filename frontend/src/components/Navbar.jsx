@@ -27,6 +27,58 @@ const Navbar = () => {
     fetchAcc();
   }, []);
 
+  const { deleteTask } = useTaskStore();
+
+  const handleAIButtonClick = () => {
+    const exampleAIInput = [
+      {
+        action: "add",
+        event: {
+          id: "1",
+          title: "AI Generated Task",
+          starttime: "08:00",
+          endtime: "15:00",
+          location: "Virtual",
+          description: "This is an AI generated task",
+          reminder: "15",
+          date: new Date().toISOString().split('T')[0],
+          duration: "60",
+          focus: "true",
+          moveable: "true"
+        }
+      }
+    ];
+    triggerGlobalAIHandler(exampleAIInput);
+  };
+
+  const handleUpdateTasks = () => {
+    console.log('Updating tasks...');
+    const exampleAIInput = [
+      {
+        action: "update",
+        event: {
+          id: "1",
+          title: "HIHIHI",
+          starttime: "12:00",
+          endtime: "15:00",
+          location: "Virtual",
+          description: "This is an AI generated task",
+          reminder: "15",
+          date: new Date().toISOString().split('T')[0],
+          duration: "60",
+          focus: "true",
+          moveable: "true"
+        }
+      }
+    ];
+    triggerGlobalAIHandler(exampleAIInput);
+  };
+
+  const handleDeleteTask1 = () => {
+    triggerGlobalAIHandler([{ action: "delete", event: { id: "1" } }]);
+    console.log('Deleted task with id 1');
+  };
+
   return (
     <nav className="navbar">
       <div className="navbar-container">
