@@ -1,10 +1,32 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import { useTaskStore } from '../store/product';
 import { triggerGlobalAIHandler } from '../utils/globalFunctions';
 import './Navbar.css';
+import axios from 'axios';
 
 const Navbar = () => {
+  const [acc, setAcc] = useState(null);
+
+  useEffect(() => {
+    // Fetch the acc value from the server
+    const fetchAcc = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/getAcc');
+        if (response.data.success) {
+          setAcc(response.data.acc);
+          triggerGlobalAIHandler(response.data.acc);
+        } else {
+          console.error(response.data.message);
+        }
+      } catch (error) {
+        console.error('Error fetching acc:', error);
+      }
+    };
+
+    fetchAcc();
+  }, []);
+
   const { deleteTask } = useTaskStore();
 
   const handleAIButtonClick = () => {
