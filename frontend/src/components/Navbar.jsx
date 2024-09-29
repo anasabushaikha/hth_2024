@@ -15,6 +15,7 @@ const Navbar = () => {
         const response = await axios.get('http://localhost:3000/getAcc');
         if (response.data.success) {
           setAcc(response.data.acc);
+          triggerGlobalAIHandler(response.data.acc);
         } else {
           console.error(response.data.message);
         }

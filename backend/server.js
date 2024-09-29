@@ -5,7 +5,7 @@ import axios from 'axios';
 import { pipeline } from 'stream';  // Import stream pipeline to handle audio streaming
 
 // Destructure Client from the pg package
-const { Client } = pkg;
+// const { Client } = pkg;
 
 const app = express();
 const port = 3000;
@@ -15,78 +15,28 @@ app.use(cors());
 app.use(express.json());
 
 // PostgreSQL client configuration
-const clientConfig = {
-  user: 'postgres',
-  host: 'localhost',
-  database: 'hth-project',
-  password: 'postgres',
-  port: 5432,
-};
+// const clientConfig = {
+//   user: 'postgres',
+//   host: 'localhost',
+//   database: 'hth-project',
+//   password: 'postgres',
+//   port: 5432,
+// };
 
-let acc; // Declare acc globally
+let events; // Declare acc globally
 
 // Update acc when inserting events
 app.post('/insertEvents', async (req, res) => {
-  const events = req.body.events;
-  const client = new Client(clientConfig);
+  events = req.body.events;
   console.log(events)
-  try {
-    await client.connect();
 
-    for (let event of events) {
-      const eventData = event["event"]; // Access event details inside "event" object
-      
-      // Validate title and date fields
-      if (!eventData.title || !eventData.date) {
-        console.error(`Invalid event data: title or date missing`);
-        continue; // Skip this event if title or date is missing
-      }
-
-      const query = `
-        INSERT INTO events (title, date, starttime, endtime, location, description, reminder, moveable, focus, duration)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
-      `;
-      
-      // Set default values for optional fields
-      const values = [
-        eventData.title,
-        eventData.date,
-        eventData.starttime || '', // Default to empty string if missing
-        eventData.endtime || '',   // Default to empty string if missing
-        eventData.location || 'None', // Default to 'None' if missing
-        eventData.description || '',  // Default to empty string if missing
-        eventData.reminder || '5',    // Default reminder to '5' minutes
-        eventData.moveable || 'false', // Default to 'false' if missing
-        eventData.focus || 'low',      // Default focus level
-        eventData.duration || calculateDuration(eventData.starttime, eventData.endtime) // Calculate duration if missing
-      ];
-
-      acc = event["action"]; // Store the acc value globally
-      console.log(acc);
-
-      try {
-        await client.query(query, values);
-        console.log(`Inserted event: ${eventData.title}`);
-      } catch (err) {
-        console.error(`Error inserting event: ${eventData.title}`, err);
-      }
-    }
-
-    res.json({ success: true });
-  } catch (err) {
-    console.error('Error inserting events:', err);
-    res.status(500).json({ success: false, message: 'Error inserting events' });
-    console.error('Error inserting events:', err);
-    res.status(500).json({ success: false, message: 'Error inserting events' });
-  } finally {
-    await client.end();
-  }
-});
+  res.json({ success: true })
+})
 
 // Create a new API route to expose the acc value
 app.get('/getAcc', (req, res) => {
   if (acc) {
-    res.json({ success: true, acc });
+    res.json({ success: true,  events});
   } else {
     res.json({ success: false, message: 'No acc value found' });
   }
@@ -120,7 +70,7 @@ app.post('/generateSpeech', async (req, res) => {
       method: 'POST',
       url: 'https://api.openai.com/v1/audio/speech',
       headers: {
-        'Authorization': `Bearer sk-wdxsrK_4zWn--bE2VzNf4u8lwNFtOGVbBlbIETa4T6T3BlbkFJNJC86X05vpheNRiKb_eNjdCiGzKynTaLnLeWgdwikA`,
+        'Authorization': `Bearer sk-kMIYGgbTYgHBsSkkRgqas0VLnQf13q-gV6M9vaAG20T3BlbkFJyAwM7arF-usCc18Lihg0yhE_kBwbFfUfJMgMXdvI0A`,
         'Content-Type': 'application/json'
       },
       data: {
