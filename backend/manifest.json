@@ -27,10 +27,13 @@
       "alarms"
     ],
     "host_permissions": [
+      "https://api.openai.com/*",
       "*://*.youtube.com/*",
       "*://*.facebook.com/*",
       "*://*.netflix.com/*",
-      "*://*.instagram.com/*"
+      "*://*.instagram.com/*",
+      "*://*.tiktok.com/*",
+      "*://*.twitter.com/*"
     ]
 }
   

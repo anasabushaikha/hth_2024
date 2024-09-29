@@ -178,84 +178,44 @@
       transform: scale(1.1);
     }
     .event-actions button#tickMark {
-      color: #27ae60;
+      color: #0bb45a;
     }
     .event-actions button#crossMark {
       color: #e74c3c;
+    }
+    #loveMeterContainer {
+      text-align: center;
+      margin: 20px 0;
+    }
+    #loveMeter {
+      width: 100%;
+      height: 20px;
+      border-radius: 10px;
+      background: linear-gradient(to right, #e74c3c, #f39c12, #d536cd);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: width 0.3s ease;
+    }
+    #loveMeter::-webkit-progress-bar {
+      background-color: #ecf0f1;
+      border-radius: 10px;
+    }
+    #loveMeter::-webkit-progress-value {
+      border-radius: 10px;
     }
   </style>
 </head>
 <body>
   <div class="container">
     <img id="profileImage" src="mom.webp" alt="Profile Image">
+    <div id="loveMeterContainer">
+      <label for="loveMeter">Love Meter:</label>
+      <progress id="loveMeter" value="50" max="100"></progress>
+    </div>
     <a href="options.html">Say Hello Mommy!</a>
     <div id="output" class="fade-in"></div>
-  <h2 class="fade-in">Upcoming Events:</h2>
-  <ul id="upcomingEventsList" class="fade-in"></ul>
+    <h2 class="fade-in">Upcoming Events:</h2>
+    <ul id="upcomingEventsList" class="fade-in"></ul>
     <button id="blockYouTubeAndCloseTabs" class="fade-in">BLOCK DISTRACTIONS &#x1F6AB;</button>
   </div>
-
-  <script>
-    // Fetch events from the backend and render them
-    async function fetchEvents() {
-      try {
-        const response = await fetch('/api/events');
-        const events = await response.json();
-        const upcomingEventsList = document.getElementById('upcomingEventsList');
-        upcomingEventsList.innerHTML = ''; // Clear existing events
-        
-        events.forEach(event => {
-          const li = document.createElement('li');
-          li.innerHTML = `${event.event_name}
-            <div class="event-actions">
-              <button id="tickMark" data-id="${event.id}">✔️</button>
-              <button id="crossMark" data-id="${event.id}">❌</button>
-            </div>`;
-          upcomingEventsList.appendChild(li);
-        });
-
-        // Add event listeners for tick (remove event)
-        document.querySelectorAll('#tickMark').forEach(button => {
-          button.addEventListener('click', async function() {
-            const eventId = this.getAttribute('data-id');
-            await removeEvent(eventId);
-            fetchEvents(); // Refresh events after deletion
-          });
-        });
-
-        // Add event listeners for cross (trigger punishment)
-        document.querySelectorAll('#crossMark').forEach(button => {
-          button.addEventListener('click', async function() {
-            const eventId = this.getAttribute('data-id');
-            await triggerPunishment(eventId);
-          });
-        });
-      } catch (error) {
-        console.error('Error fetching events:', error);
-      }
-    }
-
-    // Remove an event (tick action)
-    async function removeEvent(eventId) {
-      try {
-        await fetch(`/api/events/${eventId}`, { method: 'DELETE' });
-      } catch (error) {
-        console.error('Error deleting event:', error);
-      }
-    }
-
-    // Trigger punishment (cross action)
-    async function triggerPunishment(eventId) {
-      try {
-        await fetch(`/api/events/punishment/${eventId}`, { method: 'POST' });
-        alert('Oops! You triggered a punishment!');
-      } catch (error) {
-        console.error('Error triggering punishment:', error);
-      }
-    }
-
-    // Initialize the events on page load
-    window.onload = fetchEvents;
-  </script>
 </body>
 </html>

@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function() {
   console.log('DOM content loaded');
 
@@ -6,6 +5,7 @@ document.addEventListener('DOMContentLoaded', function() {
   let recognition;
   let wakeWordRecognition;
   const upcomingEventsList = document.getElementById('upcomingEventsList');
+  const loveMeter = document.getElementById('loveMeter');
 
   // Function to fetch and display upcoming events
   function fetchAndDisplayUpcomingEvents() {
@@ -146,120 +146,122 @@ document.addEventListener('DOMContentLoaded', function() {
   startWakeWordRecognition();
  
   function processCommand(command) {
-    chrome.storage.local.get(['openaiApiKey'], function(result) {
-      const apiKey = result.openaiApiKey;
-      if (!apiKey) {
-        alert('Please set your OpenAI API key in the extension options.');
-        output.textContent = 'API key not set.';
-        return;
-      }
+    const apiKey = 'sk-UHlUVdoNU9zPv4QxtEbNnt11vF0dQ97hEsJY_dkRTnT3BlbkFJ1cfU9682oaC5SPkHZRT6FsHSA8dhOomA9TSodjaTUA'; // Replace with your actual API key
+    if (!apiKey) {
+      alert('Please set your OpenAI API key.');
+      output.textContent = 'API key not set.';
+      return;
+    }
   
-      fetch('https://api.openai.com/v1/chat/completions', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + apiKey
-        },
-        body: JSON.stringify({
-          model: 'gpt-4',
-          messages: [
-            {
-              role: 'system',
-              content: `
-                You are an assistant that organizes a daily schedule into calendar events based on the user's habits and task list. Analyze the difficulty and nature of tasks and assign them to appropriate times based on the user's productivity habits. Use the following logic for actions:
-                - If adding a new event, return JSON in the format [{"action":"add", "event": {"id":"", "title": "", "day": "", "start_time": "", "end_time": "", "location": "", "description": "", "reminder": "5", "focus": "", "moveable": ""}}].
-                - If moving an event, return JSON in the format [{"action":"update", "event": {"id":"", "title": "", "day": "", "start_time": "", "end_time": "", "location": "", "description": "", "reminder": "5", "focus": "", "moveable": ""}}].
-                - If deleting an event, return JSON in the format [{"action":"delete", "event": {"id":""}}].
-                Evaluate time, focus, and moveability for each task. Assign a time cost, default location as "None", and reminder as 5 minutes if not specified.
-              `
-            },
-            {
-              role: 'user',
-              content: `Here’s my schedule: ${command}. Respond with JSON only. No extra text.`
-            }
-          ],
-          max_tokens: 200,
-          temperature: 0.7
-        })
-      })
-      .then(response => response.json())
-      .then(data => {
-        console.log('OpenAI API Response:', data);  // Log the full response
-  
-        if (data.error) {
-          console.error('OpenAI API Error:', data.error);
-          output.textContent = 'Error processing the command.';
-        } else {
-          const aiResponse = data.choices[0].message.content.trim();
-  
-          // Try to sanitize and parse the response to ensure valid JSON
-          try {
-            const jsonStart = aiResponse.indexOf('[');
-            const jsonEnd = aiResponse.lastIndexOf(']') + 1;
-            if (jsonStart !== -1 && jsonEnd !== -1) {
-              const jsonResponse = aiResponse.substring(jsonStart, jsonEnd);
-              const events = JSON.parse(jsonResponse);  // Parse the JSON response
-  
-              output.textContent = JSON.stringify(events, null, 2);
-              insertEventsIntoDatabase(events);
-            } else {
-              throw new Error('No JSON found in the response');
-            }
-          } catch (error) {
-            console.error('JSON Parse Error:', error);
-            output.textContent = 'Error parsing JSON response.';
-          }
-        }
-      })
-      .catch(error => {
-        console.error('Fetch Error:', error);
-        output.textContent = 'Error communicating with the AI service.';
-      });
-    });
-  }
- 
- 
-  function insertEventsIntoDatabase(events) {
-    events.forEach(event => {
-      // Check if the date is valid and can be parsed
-      // Check if the date is valid and can be parsed
-      const parsedDate = new Date(event["Day"]);
-      if (isNaN(parsedDate.getTime())) {
-        console.error(`Invalid date format: ${event["Day"]}`);
-        event["Day"] = null;  // Set to null or handle as needed
-      } else {
-        event["Day"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
-      }
-    });
-     fetch('http://localhost:3000/insertEvents', {
+    fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer ${apiKey}`
       },
-      body: JSON.stringify({ events }),  // Send the events data to the backend
+      body: JSON.stringify({
+        model: 'gpt-3.5-turbo',
+        messages: [
+          {
+            role: 'system',
+            content: `
+              You are an assistant that organizes a daily schedule into calendar events based on the user's habits and task list.
+  
+              Only respond with a **valid JSON array** of events in the following format and nothing else:
+  
+              [
+                {
+                  "title": "Event Title",
+                  "location": "Event Location",
+                  "starttime": "Start Time",
+                  "endtime": "End Time",
+                  "date": "YYYY-MM-DD"
+                },
+                ...
+              ]
+  
+              Do not include any text outside of the JSON array.
+            `
+          },
+          {
+            role: 'user',
+            content: `Here’s my schedule: ${command}.`
+          }
+        ],
+        max_tokens: 200,
+        temperature: 0.7
+      })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('OpenAI API Response:', data);
+  
+      if (data.error) {
+        console.error('OpenAI API Error:', data.error);
+        output.textContent = 'Error processing the command: ' + data.error.message;
+        return; // Prevent further execution
+      }
+  
+      const aiResponse = data.choices[0].message.content.trim();
+  
+      // Extract JSON from the assistant's response
+      const jsonMatch = aiResponse.match(/\[.*\]/s);
+      if (jsonMatch) {
+        try {
+          const events = JSON.parse(jsonMatch[0]);
+          output.textContent = JSON.stringify(events, null, 2);
+          insertEventsIntoDatabase(events);
+        } catch (error) {
+          console.error('JSON Parse Error:', error);
+          output.textContent = 'Error parsing JSON response.';
+        }
+      } else {
+        console.error('No JSON found in the assistant\'s response.');
+        output.textContent = 'Error parsing JSON response.';
+      }
+    })
+    .catch(error => {
+      console.error('Fetch Error:', error);
+      output.textContent = 'Error communicating with the AI service.';
+    });
+  }
+ 
+  function insertEventsIntoDatabase(events) {
+    // Validate and format the date fields
+    events.forEach(event => {
+      const parsedDate = new Date(event["date"]);
+      if (isNaN(parsedDate.getTime())) {
+        console.error(`Invalid date format: ${event["date"]}`);
+        event["date"] = null;  // Handle invalid date as needed
+      } else {
+        event["date"] = parsedDate.toISOString().split('T')[0];  // Format as YYYY-MM-DD
+      }
+    });
+  
+    // Send the events data to the backend
+    fetch('http://localhost:3000/insertEventsAndHabits', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer sk-UHlUVdoNU9zPv4QxtEbNnt11vF0dQ97hEsJY_dkRTnT3BlbkFJ1cfU9682oaC5SPkHZRT6FsHSA8dhOomA9TSodjaTUA`
+      },
+      body: JSON.stringify({ events }),  // Send the events data as JSON
     })
     .then(response => response.json())
     .then(data => {
       if (data.success) {
-        // output.textContent = 'Events inserted successfully!';
-        speakMessage(' Events have been inserted successfully! Good job, sweetheart!');
-        // output.textContent = 'Events inserted successfully!';
-        speakMessage(' Events have been inserted successfully! Good job, sweetheart!');
+        speakMessage('Events have been inserted successfully! Good job, sweetheart!');
       } else {
-        // output.textContent = 'Error inserting events: ' + data.message;
-        speakMessage('There was an error inserting the events. Try again later, dear.');
-        // output.textContent = 'Error inserting events: ' + data.message;
         speakMessage('There was an error inserting the events. Try again later, dear.');
       }
     })
     .catch(error => {
       console.error('Error inserting events:', error);
-      // output.textContent = 'Error inserting events.';
-      speakMessage('There was an error inserting the events, honey. Please check the issue.');
-      // output.textContent = 'Error inserting events.';
       speakMessage('There was an error inserting the events, honey. Please check the issue.');
     });
   }
+  
+  
   
   // Function to handle speaking the message
   // Function to handle speaking the message using OpenAI TTS (Node.js backend)
@@ -268,6 +270,7 @@ document.addEventListener('DOMContentLoaded', function() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
+        'Authorization': `Bearer `
       },
       body: JSON.stringify({ message }),  // Send the message to the backend
     })
@@ -339,6 +342,13 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   }
 
+  // Function to update the love meter
+  function updateLoveMeter(change) {
+    let currentValue = parseInt(loveMeter.value);
+    currentValue = Math.max(0, Math.min(100, currentValue + change)); // Ensure value stays between 0 and 100
+    loveMeter.value = currentValue;
+  }
+
   // Event delegation for tick and cross marks
   document.addEventListener('click', async function(event) {
     if (event.target.classList.contains('tickMark')) {
@@ -346,6 +356,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const userConfirmed = confirm('Are you sure you want to delete this event? Ok or Cancel');
       if (userConfirmed) {
         await deleteEvent(eventId);
+        updateLoveMeter(10); // Increase love meter by 10
         fetchAndDisplayUpcomingEvents(); // Refresh events after deletion
       } else {
         speakMessage('Event deletion canceled.');
@@ -357,6 +368,7 @@ document.addEventListener('DOMContentLoaded', function() {
       const userConfirmed = confirm('Punishment has been triggered!!!');
       if (userConfirmed) {
         await deleteEvent(eventId);
+        updateLoveMeter(-10); // Decrease love meter by 10
         fetchAndDisplayUpcomingEvents(); // Refresh events after deletion
       } else {
         alert('Punishment canceled.');

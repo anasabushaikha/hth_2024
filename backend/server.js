@@ -36,7 +36,7 @@ app.post('/insertEventsAndHabits', async (req, res) => {
     // Insert events into schedule_events table
     for (let event of events) {
       const query = `
-        INSERT INTO schedule_events (title, event_date, start_time, end_time, location, description, reminder, duration, focus, moveable)
+        INSERT INTO events (title, date, starttime, endtime, location, description, reminder, duration, focus, moveable)
         VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
       `;
       const values = [
