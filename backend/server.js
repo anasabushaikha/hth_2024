@@ -23,12 +23,13 @@ const clientConfig = {
   port: 5432,
 };
 
-// Endpoint to handle event and habit insertion
+let acc; // Declare acc globally
+
+// Update acc when inserting events
 app.post('/insertEvents', async (req, res) => {
   const events = req.body.events;
-
   const client = new Client(clientConfig);
-  console.log(res)
+
   try {
     await client.connect();
 
@@ -38,7 +39,7 @@ app.post('/insertEvents', async (req, res) => {
         VALUES ($1, $2, $3, $4, $5, $6, $7);
       `;
       const values = [
-        event["title"],    // Consistent naming convention for event properties
+        event["title"],
         event["day"],
         event["start_time"],
         event["end_time"],
@@ -46,21 +47,13 @@ app.post('/insertEvents', async (req, res) => {
         event["description"],
         event["reminder"]
       ];
-      
-      const acc = event["action"];
-      console.log(acc)
-    
-      try {
-        await client.query(query, values); // Ensure to wrap in try-catch to handle potential errors
-        console.log(`Inserted event: ${event["title"]}`);
-      } catch (err) {
-        console.error(`Error inserting event: ${event["title"]}`, err);
-      }
-    }
-    
 
-    // After successfully inserting, generate speech
-    const message = 'You sexy beast! Events have been inserted successfully! Good job, sweetheart!';
+      acc = event["action"]; // Store the acc value globally
+      console.log(acc);
+
+      await client.query(query, values);
+    }
+
     res.json({ success: true });
   } catch (err) {
     console.error('Error inserting events:', err);
@@ -69,6 +62,16 @@ app.post('/insertEvents', async (req, res) => {
     await client.end();
   }
 });
+
+// Create a new API route to expose the acc value
+app.get('/getAcc', (req, res) => {
+  if (acc) {
+    res.json({ success: true, acc });
+  } else {
+    res.json({ success: false, message: 'No acc value found' });
+  }
+});
+
 
 // Endpoint to fetch events
 app.get('/getEvents', async (req, res) => {

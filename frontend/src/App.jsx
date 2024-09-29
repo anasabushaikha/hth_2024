@@ -4,7 +4,9 @@ import Navbar from './components/Navbar'
 import Timetable from './components/Timetable'
 import BlockWebsite from './components/BlockWebsite'
 import CloudDecoration from './components/CloudDecoration'
+import { useTaskStore } from './store/product'
 import './App.css'
+
 
 function App() {
   const [currentDate, setCurrentDate] = useState(() => {
@@ -12,6 +14,10 @@ function App() {
     today.setHours(0, 0, 0, 0)
     return today
   })
+
+
+  const { addTask, updateTask, deleteTask } = useTaskStore()
+
 
   const goToPreviousWeek = () => {
     setCurrentDate(prevDate => {
@@ -21,6 +27,7 @@ function App() {
     })
   }
 
+
   const goToNextWeek = () => {
     setCurrentDate(prevDate => {
       const newDate = new Date(prevDate)
@@ -29,17 +36,46 @@ function App() {
     })
   }
 
+
+  const handleAIInput = (aiInput) => {
+    aiInput.forEach(item => {
+      if (item.action === "add") {
+        const newTask = {
+          id: Date.now().toString(),
+          title: item.event.title,
+          date: item.event.date,
+          startTime: item.event.starttime,
+          duration: parseInt(item.event.duration),
+          description: item.event.description,
+          location: item.event.location,
+          reminder: item.event.reminder,
+          focus: item.event.focus === "true",
+          moveable: item.event.moveable === "true"
+        };
+        addTask(newTask);
+        console.log('Task added:', newTask.title);
+      } else if (item.action === "update") {
+        updateTask(item.event.id, item.event);
+        console.log('Task updated:', item.event.title);
+      } else if (item.action === "delete") {
+        deleteTask(item.event.id);
+        console.log('Task deleted:', item.event.id);
+      }
+    });
+  }
+
+
   return (
     <div className="app">
-      <Navbar />
+      <Navbar handleAIInput={handleAIInput} />
       <CloudDecoration position="left" />
       <CloudDecoration position="right" />
       <div className="content">
         <Routes>
           <Route path="/" element={
             <div className="timetable-container">
-              <Timetable 
-                currentDate={currentDate} 
+              <Timetable
+                currentDate={currentDate}
                 goToPreviousWeek={goToPreviousWeek}
                 goToNextWeek={goToNextWeek}
               />
@@ -52,5 +88,7 @@ function App() {
   )
 }
 
+
 export default App
+
 

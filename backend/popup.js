@@ -255,5 +255,38 @@ document.addEventListener('DOMContentLoaded', function() {
       });
   }
 
+  function speakMessage(message) {
+    const profileImage = document.getElementById('profileImage');
+    profileImage.classList.add('talking');
+
+    fetch('http://localhost:3000/generateSpeech', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ message }),
+    })
+      .then(response => {
+        if (!response.ok) {
+          throw new Error('Error generating speech');
+        }
+        return response.blob();
+      })
+      .then(audioBlob => {
+        const audioURL = URL.createObjectURL(audioBlob);
+        const audio = new Audio(audioURL);
+
+        audio.onended = () => {
+          profileImage.classList.remove('talking');
+        };
+
+        audio.play();
+      })
+      .catch(error => {
+        console.error('Error fetching audio:', error);
+        profileImage.classList.remove('talking');
+      });
+  }
+
   
 });
