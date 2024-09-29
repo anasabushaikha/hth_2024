@@ -1,67 +1,59 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { useTaskStore } from '../store/product';  // Import useTaskStore
+import { useTaskStore } from '../store/product';
+import { triggerGlobalAIHandler } from '../utils/globalFunctions';
 import './Navbar.css';
 
-const Navbar = ({ handleAIInput }) => {
-  const { deleteTask } = useTaskStore();  // Get deleteTask function from the store
+const Navbar = () => {
+  const { deleteTask } = useTaskStore();
 
   const handleAIButtonClick = () => {
-    if (handleAIInput) {
-
-      const exampleAIInput = [
-        {
-          action: "add",
-          event: {
-            id: "1",
-            title: "AI Generated Task",
-            starttime: "08:00",
-            endtime: "15:00",
-            location: "Virtual",
-            description: "This is an AI generated task",
-            reminder: "15",
-            date: new Date().toISOString().split('T')[0],
-            duration: "60",
-            focus: "true",
-            moveable: "true"
-          }
+    const exampleAIInput = [
+      {
+        action: "add",
+        event: {
+          id: "1",
+          title: "AI Generated Task",
+          starttime: "08:00",
+          endtime: "15:00",
+          location: "Virtual",
+          description: "This is an AI generated task",
+          reminder: "15",
+          date: new Date().toISOString().split('T')[0],
+          duration: "60",
+          focus: "true",
+          moveable: "true"
         }
-      ];
-      handleAIInput(exampleAIInput);
-    } else {
-      console.error('handleAIInput is not available');
-    }
+      }
+    ];
+    triggerGlobalAIHandler(exampleAIInput);
   };
 
   const handleUpdateTasks = () => {
     console.log('Updating tasks...');
-    if (handleAIInput) {
-      const exampleAIInput = [
-        {
-          action: "update",
-          event: {
-            id: "1",
-            title: "HIHIHI",
-            starttime: "12:00",
-            endtime: "15:00",
-            location: "Virtual",
-            description: "This is an AI generated task",
-            reminder: "15",
-            date: new Date().toISOString().split('T')[0],
-            duration: "60",
-            focus: "true",
-            moveable: "true"
-          }
+    const exampleAIInput = [
+      {
+        action: "update",
+        event: {
+          id: "1",
+          title: "HIHIHI",
+          starttime: "12:00",
+          endtime: "15:00",
+          location: "Virtual",
+          description: "This is an AI generated task",
+          reminder: "15",
+          date: new Date().toISOString().split('T')[0],
+          duration: "60",
+          focus: "true",
+          moveable: "true"
         }
-      ];
-      handleAIInput(exampleAIInput);
-    } else {
-      console.error('handleUpdateTasks is not available');
-    }
+      }
+    ];
+    triggerGlobalAIHandler(exampleAIInput);
   };
 
   const handleDeleteTask1 = () => {
-    deleteTask("1");  // Delete task with id "1"
+    triggerGlobalAIHandler([{ action: "delete", event: { id: "1" } }]);
     console.log('Deleted task with id 1');
   };
 
@@ -108,6 +100,5 @@ const Navbar = ({ handleAIInput }) => {
     </nav>
   );
 };
-
 
 export default Navbar;

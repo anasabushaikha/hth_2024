@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useCallback } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Timetable from './components/Timetable'
@@ -6,7 +6,7 @@ import BlockWebsite from './components/BlockWebsite'
 import CloudDecoration from './components/CloudDecoration'
 import { useTaskStore } from './store/product'
 import './App.css'
-
+import { setGlobalAIHandler } from './utils/globalFunctions';
 
 function App() {
   const [currentDate, setCurrentDate] = useState(() => {
@@ -25,7 +25,6 @@ function App() {
     })
   }
 
-
   const goToNextWeek = () => {
     setCurrentDate(prevDate => {
       const newDate = new Date(prevDate)
@@ -34,7 +33,7 @@ function App() {
     })
   }
 
-  const handleAIInput = (aiInput) => {
+  const handleAIInput = useCallback((aiInput) => {
     aiInput.forEach(item => {
       if (item.action === "add") {
         const newTask = {
@@ -59,11 +58,14 @@ function App() {
         console.log('Task deleted:', item.event.id);
       }
     });
-  }
+  }, [addTask, updateTask, deleteTask]);
+
+  // Set the global AI handler
+  setGlobalAIHandler(handleAIInput);
 
   return (
     <div className="app">
-      <Navbar handleAIInput={handleAIInput} />
+      <Navbar />
       <CloudDecoration position="left" />
       <CloudDecoration position="right" />
       <div className="content">
@@ -83,7 +85,6 @@ function App() {
     </div>
   )
 }
-
 
 export default App
 
