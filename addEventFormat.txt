@@ -1,0 +1,47 @@
+CREATE TABLE public.events (
+    id SERIAL PRIMARY KEY,           -- Automatically increments with each new entry
+    title TEXT,                      -- The title of the event
+    starttime TIME,                  -- Start time of the event
+    endtime TIME,                    -- End time of the event
+    location TEXT,                   -- Location of the event
+    description TEXT,                -- Event description
+    reminder TEXT,                   -- Reminder information (e.g., "20 min before")
+    date DATE,                       -- Date of the event
+    duration INTEGER,                -- Duration of the event in minutes
+    moveable BOOLEAN,                -- Whether the event is moveable (true/false)
+    focus BOOLEAN                    -- Indicates if this event is a focus event (true/false)
+);
+
+-- Step 2: Insert 30 records for dates from September 27 to October 5 using 24-hour format for times
+INSERT INTO public.events (id, title, starttime, endtime, location, description, reminder, date, duration, moveable, focus)
+VALUES
+(1, 'Take kids out to eat', '09:00', '10:00', 'Restaurant', 'Have a nice time with the kids', '5', '2024-09-27', '60', 'true', 'false'),
+(2, 'Team Meeting', '10:00', '11:00', 'Conference Room A', 'Weekly team sync-up', '1 day before', '2024-09-27', '60', 'true', 'true'),
+(3, 'Doctor Appointment', '11:00', '12:00', 'Clinic', 'Annual health check-up', '3 hours before', '2024-09-28', '60', 'false', 'false'),
+(4, 'Project Deadline', '12:00', '13:00', 'Office', 'Submit final project report', '2 days before', '2024-09-28', '60', 'true', 'true'),
+(5, 'Client Meeting', '13:00', '14:00', 'Client HQ', 'Present project proposal', '1 day before', '2024-09-28', '60', 'false', 'false'),
+(6, 'Team Lunch', '14:00', '15:00', 'Restaurant', 'Team building lunch', '1 hour before', '2024-09-29', '60', 'true', 'true'),
+(7, 'Grocery Shopping', '15:00', '16:00', 'Supermarket', 'Buy groceries for the week', '1 hour before', '2024-09-29', '60', 'false', 'true'),
+(8, 'Yoga Class', '09:00', '10:00', 'Fitness Center', 'Morning yoga session', '3 hours before', '2024-09-30', '60', 'true', 'false'),
+(9, 'Team Meeting', '10:00', '11:00', 'Conference Room B', 'Bi-weekly meeting', '1 day before', '2024-09-30', '60', 'true', 'true'),
+(10, 'Doctor Appointment', '11:00', '12:00', 'Clinic', 'Dentist appointment', '1 day before', '2024-10-01', '60', 'false', 'true'),
+(11, 'Coffee with Friend', '12:00', '13:00', 'Coffee Shop', 'Catch up with friend', '2 hours before', '2024-10-01', '60', 'true', 'false'),
+(12, 'Team Building Activity', '13:00', '14:00', 'Park', 'Outdoor team activity', '1 week before', '2024-10-01', '60', 'true', 'false'),
+(13, 'Client Presentation', '14:00', '15:00', 'Client HQ', 'Showcase project results', '1 day before', '2024-10-02', '60', 'true', 'true'),
+(14, 'Work on Personal Project', '15:00', '16:00', 'Home Office', 'Develop new app feature', '2 hours before', '2024-10-02', '60', 'false', 'true'),
+(15, 'Weekly Planning', '09:00', '10:00', 'Conference Room A', 'Plan week ahead', '1 hour before', '2024-10-03', '60', 'true', 'false'),
+(16, 'Team Meeting', '10:00', '11:00', 'Conference Room B', 'Project status update', '1 day before', '2024-10-03', '60', 'true', 'true'),
+(17, 'Doctor Appointment', '11:00', '12:00', 'Clinic', 'Eye check-up', '1 day before', '2024-10-04', '60', 'false', 'false'),
+(18, 'Lunch with Manager', '12:00', '13:00', 'Restaurant', 'Discuss performance review', '3 hours before', '2024-10-04', '60', 'true', 'false'),
+(19, 'Team Building Activity', '13:00', '14:00', 'Outdoor Venue', 'Outdoor activities for team bonding', '1 day before', '2024-10-04', '60', 'false', 'true'),
+(20, 'Client Meeting', '14:00', '15:00', 'Client HQ', 'Discuss upcoming project', '1 week before', '2024-10-05', '60', 'true', 'true'),
+(21, 'Project Review', '15:00', '16:00', 'Office', 'Review the progress of the project', '1 day before', '2024-10-05', '60', 'false', 'true'),
+(22, 'Gym Workout', '09:00', '10:00', 'Fitness Center', 'Morning workout', '3 hours before', '2024-09-27', '60', 'true', 'false'),
+(23, 'Team Meeting', '10:00', '11:00', 'Conference Room A', 'Sprint planning', '1 day before', '2024-09-27', '60', 'true', 'true'),
+(24, 'Doctor Appointment', '11:00', '12:00', 'Clinic', 'Follow-up check-up', '1 day before', '2024-09-28', '60', 'false', 'false'),
+(25, 'Client Meeting', '12:00', '13:00', 'Client HQ', 'Discuss next phase of the project', '2 hours before', '2024-09-28', '60', 'true', 'true'),
+(26, 'Workshop', '13:00', '14:00', 'Office', 'Attend a workshop on new technology', '3 hours before', '2024-09-29', '60', 'false', 'true'),
+(27, 'Team Building Activity', '14:00', '15:00', 'Park', 'Outdoor activities for team bonding', '1 week before', '2024-09-29', '60', 'true', 'true'),
+(28, 'Client Presentation', '15:00', '16:00', 'Client HQ', 'Present project deliverables', '2 hours before', '2024-09-30', '60', 'false', 'false'),
+(29, 'Team Meeting', '09:00', '10:00', 'Conference Room A', 'Monthly meeting', '1 day before', '2024-09-30', '60', 'true', 'true'),
+(30, 'Doctor Appointment', '10:00', '11:00', 'Clinic', 'General health check-up', '3 hours before', '2024-10-01', '60', 'false', 'false');
