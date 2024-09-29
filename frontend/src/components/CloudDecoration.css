@@ -1,117 +1,117 @@
 .cloud-decoration {
-  position: fixed;
-  top: 0;
-  bottom: 0;
-  width: 180px; /* Increased width to allow more space for clouds */
-  pointer-events: none;
-  z-index: 1000;
-}
-
-.cloud-decoration.left {
-  left: -30px; /* Moved 20px towards the center */
-}
-
-.cloud-decoration.right {
-  right: -30px; /* Moved 20px towards the center */
-}
-
-.cloud {
-  position: absolute;
-  background: #fff;
-  border-radius: 100px;
-  opacity: 0.7;
-}
-
-.cloud::before,
-.cloud::after {
-  content: '';
-  position: absolute;
-  background: #fff;
-  border-radius: 50%;
-}
-
-.cloud-1 {
-  width: 100px;
-  height: 30px;
-  top: 20%;
-  left: 20px; /* Moved 20px towards the center */
-}
-
-.cloud-1::before {
-  width: 40px;
-  height: 40px;
-  top: -20px;
-  left: 10px;
-}
-
-.cloud-1::after {
-  width: 60px;
-  height: 60px;
-  top: -30px;
-  right: 10px;
-}
-
-.cloud-2 {
-  width: 90px;
-  height: 27px;
-  top: 70%; /* Moved down to avoid interfering with navigation buttons */
-  left: 50px; /* Moved 20px towards the center */
-}
-
-.cloud-2::before {
-  width: 36px;
-  height: 36px;
-  top: -18px;
-  left: 9px;
-}
-
-.cloud-2::after {
-  width: 54px;
-  height: 54px;
-  top: -27px;
-  right: 9px;
-}
-
-.cloud-3 {
-  width: 110px;
-  height: 33px;
-  top: 90%;
-  left: 10px; /* Moved 20px towards the center */
-}
-
-.cloud-3::before {
-  width: 44px;
-  height: 44px;
-  top: -22px;
-  left: 11px;
-}
-
-.cloud-3::after {
-  width: 66px;
-  height: 66px;
-  top: -33px;
-  right: 11px;
-}
-
-.cloud-decoration.right .cloud-1 { left: auto; right: 20px; } /* Adjusted for right side */
-.cloud-decoration.right .cloud-2 { left: auto; right: 50px; } /* Adjusted for right side */
-.cloud-decoration.right .cloud-3 { left: auto; right: 10px; } /* Adjusted for right side */
-
-@keyframes float-1 {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(10px); }
-}
-
-@keyframes float-2 {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(-10px); }
-}
-
-@keyframes float-3 {
-  0%, 100% { transform: translateX(0); }
-  50% { transform: translateX(15px); }
-}
-
-.cloud-1 { animation: float-1 12s infinite ease-in-out; }
-.cloud-2 { animation: float-2 10s infinite ease-in-out; }
-.cloud-3 { animation: float-3 14s infinite ease-in-out; }
+    position: fixed;
+    top: 0;
+    bottom: 0;
+    width: 180px; /* Increased width to allow more space for clouds */
+    pointer-events: none;
+    z-index: 1000;
+  }
+  
+  .cloud-decoration.left {
+    left: -30px; /* Moved 20px towards the center */
+  }
+  
+  .cloud-decoration.right {
+    right: -30px; /* Moved 20px towards the center */
+  }
+  
+  .cloud {
+    position: absolute;
+    background: #fff;
+    border-radius: 100px;
+    opacity: 0.7;
+  }
+  
+  .cloud::before,
+  .cloud::after {
+    content: '';
+    position: absolute;
+    background: #fff;
+    border-radius: 50%;
+  }
+  
+  .cloud-1 {
+    width: 100px;
+    height: 30px;
+    top: 20%;
+    left: 20px; /* Moved 20px towards the center */
+  }
+  
+  .cloud-1::before {
+    width: 40px;
+    height: 40px;
+    top: -20px;
+    left: 10px;
+  }
+  
+  .cloud-1::after {
+    width: 60px;
+    height: 60px;
+    top: -30px;
+    right: 10px;
+  }
+  
+  .cloud-2 {
+    width: 90px;
+    height: 27px;
+    top: 70%; /* Moved down to avoid interfering with navigation buttons */
+    left: 50px; /* Moved 20px towards the center */
+  }
+  
+  .cloud-2::before {
+    width: 36px;
+    height: 36px;
+    top: -18px;
+    left: 9px;
+  }
+  
+  .cloud-2::after {
+    width: 54px;
+    height: 54px;
+    top: -27px;
+    right: 9px;
+  }
+  
+  .cloud-3 {
+    width: 110px;
+    height: 33px;
+    top: 90%;
+    left: 10px; /* Moved 20px towards the center */
+  }
+  
+  .cloud-3::before {
+    width: 44px;
+    height: 44px;
+    top: -22px;
+    left: 11px;
+  }
+  
+  .cloud-3::after {
+    width: 66px;
+    height: 66px;
+    top: -33px;
+    right: 11px;
+  }
+  
+  .cloud-decoration.right .cloud-1 { left: auto; right: 20px; } /* Adjusted for right side */
+  .cloud-decoration.right .cloud-2 { left: auto; right: 50px; } /* Adjusted for right side */
+  .cloud-decoration.right .cloud-3 { left: auto; right: 10px; } /* Adjusted for right side */
+  
+  @keyframes float-1 {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(10px); }
+  }
+  
+  @keyframes float-2 {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(-10px); }
+  }
+  
+  @keyframes float-3 {
+    0%, 100% { transform: translateX(0); }
+    50% { transform: translateX(15px); }
+  }
+  
+  .cloud-1 { animation: float-1 12s infinite ease-in-out; }
+  .cloud-2 { animation: float-2 10s infinite ease-in-out; }
+  .cloud-3 { animation: float-3 14s infinite ease-in-out; }

@@ -135,6 +135,13 @@ app.get('/events', async (req, res) => {
 // DELETE to handle event deletion
 app.delete('/deleteEvent/:id', async (req, res) => {
   const eventId = req.params.id;
+  const client = new Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'hth-project',
+    password: 'postgres',
+    port: 5432,
+  });
 
   try {
     // await client.connect();

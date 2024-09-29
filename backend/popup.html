@@ -147,7 +147,6 @@
       padding: 0;
       margin-top: 20px;
     }
-
     #upcomingEventsList li {
       background-color: #ffffff;
       margin-bottom: 10px;
@@ -156,52 +155,67 @@
       box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
       transition: transform 0.2s ease, box-shadow 0.2s ease;
     }
-
     #upcomingEventsList li:hover {
       transform: translateY(-2px);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
-<<<<<<< HEAD
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
-    }
-
-    #profileImage.talking {
-      animation: pulse 1.5s infinite;
-    }
-=======
-
-     .event-actions {                  /*green checkmark box and red cross box */
+    .event-actions {
       display: flex;
-      justify-content: space-between;
+      gap: 15px;
       margin-top: 10px;
     }
     .event-actions button {
+      background-color: #ecf0f1;
       border: none;
-      background: none;
+      border-radius: 5px;
+      padding: 5px 10px;
       cursor: pointer;
-      font-size: 20px;
+      transition: background-color 0.3s ease, transform 0.2s ease;
+      font-size: 16px;
     }
-    .event-actions .checkmark {
-      color: green;
+    .event-actions button:hover {
+      background-color: #bdc3c7;
+      transform: scale(1.1);
     }
-    .event-actions .cross {
-      color: red;
+    .event-actions button#tickMark {
+      color: #0bb45a;
     }
-
->>>>>>> 47c5f978832d29a82142db3a537286ea1c0ff098
+    .event-actions button#crossMark {
+      color: #e74c3c;
+    }
+    #loveMeterContainer {
+      text-align: center;
+      margin: 20px 0;
+    }
+    #loveMeter {
+      width: 100%;
+      height: 20px;
+      border-radius: 10px;
+      background: linear-gradient(to right, #e74c3c, #f39c12, #d536cd);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      transition: width 0.3s ease;
+    }
+    #loveMeter::-webkit-progress-bar {
+      background-color: #ecf0f1;
+      border-radius: 10px;
+    }
+    #loveMeter::-webkit-progress-value {
+      border-radius: 10px;
+    }
   </style>
 </head>
 <body>
   <div class="container">
     <img id="profileImage" src="mom.webp" alt="Profile Image">
-    <a href="options.html">OpenAi</a>
+    <div id="loveMeterContainer">
+      <label for="loveMeter">Love Meter:</label>
+      <progress id="loveMeter" value="50" max="100"></progress>
+    </div>
+    <a href="options.html">Say Hello World!</a>
     <div id="output" class="fade-in"></div>
-  <h2 class="fade-in">Upcoming Events:</h2>
-  <ul id="upcomingEventsList" class="fade-in"></ul>
-  <button id="blockYouTubeAndCloseTabs" class="fade-in">BLOCK DISTRACTIONS &#x1F6AB;</button>
+    <h2 class="fade-in">Upcoming Events:</h2>
+    <ul id="upcomingEventsList" class="fade-in"></ul>
+    <button id="blockYouTubeAndCloseTabs" class="fade-in">BLOCK DISTRACTIONS &#x1F6AB;</button>
   </div>
   <script src="backend/punishment.js"></script>
   <script src="backend/popup.js"></script>
