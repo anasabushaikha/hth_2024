@@ -161,6 +161,7 @@
       transform: translateY(-2px);
       box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
     }
+<<<<<<< HEAD
     @keyframes pulse {
       0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
       70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
@@ -170,6 +171,27 @@
     #profileImage.talking {
       animation: pulse 1.5s infinite;
     }
+=======
+
+     .event-actions {                  /*green checkmark box and red cross box */
+      display: flex;
+      justify-content: space-between;
+      margin-top: 10px;
+    }
+    .event-actions button {
+      border: none;
+      background: none;
+      cursor: pointer;
+      font-size: 20px;
+    }
+    .event-actions .checkmark {
+      color: green;
+    }
+    .event-actions .cross {
+      color: red;
+    }
+
+>>>>>>> 47c5f978832d29a82142db3a537286ea1c0ff098
   </style>
 </head>
 <body>
@@ -181,5 +203,7 @@
   <ul id="upcomingEventsList" class="fade-in"></ul>
   <button id="blockYouTubeAndCloseTabs" class="fade-in">BLOCK DISTRACTIONS &#x1F6AB;</button>
   </div>
+  <script src="backend/punishment.js"></script>
+  <script src="backend/popup.js"></script>
 </body>
 </html>

@@ -52,7 +52,7 @@ function applyMonochrome(duration) {
 // applyMonochrome(10000);
 
 // Random punishment function
-function applyRandomPunishment() {
+export function applyRandomPunishment() {
   const punishments = [
     { func: invertMouse, name: 'mouse inversion' },
     { func: () => applyMonochrome(10000), name: 'monochrome effect' }

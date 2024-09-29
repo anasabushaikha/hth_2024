@@ -1,8 +1,65 @@
+import { applyRandomPunishment } from '../hth_2024/frontend/src/punishment.js';
+
 document.addEventListener('DOMContentLoaded', function() {
   const output = document.getElementById('output');
   let recognition;
   let wakeWordRecognition;
   const upcomingEventsList = document.getElementById('upcomingEventsList');
+
+
+  function fetchAndDisplayUpcomingEvents() {
+    fetch('http://localhost:3000/upcomingEvents')
+      .then(response => {
+        console.log('Response:', response);
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Data:', data);
+        upcomingEventsList.innerHTML = '';
+
+        if (data.success) {
+          const events = data.events;
+
+          if (events.length === 0) {
+            upcomingEventsList.innerHTML = '<li>No upcoming events.</li>';
+          } else {
+            events.forEach(event => {
+              const listItem = document.createElement('li');
+              listItem.innerHTML = `
+                ${event.title} at ${event.start_time}
+                <div class="event-actions">
+                  <button class="checkmark">&#x2714;</button>
+                  <button class="cross">&#x2716;</button>
+                </div>
+              `;
+              upcomingEventsList.appendChild(listItem);
+
+              // Add event listeners for the checkmark and cross buttons
+              listItem.querySelector('.checkmark').addEventListener('click', () => {
+                // Handle checkmark click (e.g., mark event as completed)
+                console.log(`Event "${event.title}" marked as completed.`);
+              });
+
+              listItem.querySelector('.cross').addEventListener('click', () => {
+                // Handle cross click (e.g., apply punishment)
+                console.log(`Event "${event.title}" marked as failed.`);
+                applyRandomPunishment(); // Call the punishment function
+              });
+            });
+          }
+        } else {
+          console.error('Error fetching upcoming events:', data.message);
+          upcomingEventsList.innerHTML = '<li>Error fetching upcoming events.</li>';
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching upcoming events:', error);
+        upcomingEventsList.innerHTML = '<li>Error fetching upcoming events.</li>';
+      });
+  }
 
   // Function to fetch and display upcoming events
   function fetchAndDisplayUpcomingEvents() {
@@ -26,7 +83,8 @@ document.addEventListener('DOMContentLoaded', function() {
           } else {
             events.forEach(event => {
               const listItem = document.createElement('li');
-              listItem.textContent = `${event.title} at ${event.start_time}`;
+              const formattedDate = new Date(event.date).toLocaleDateString();
+              listItem.textContent = `${event.title} in ${event.location} at ${event.endtime} on ${formattedDate}`;
               upcomingEventsList.appendChild(listItem);
             });
           }
