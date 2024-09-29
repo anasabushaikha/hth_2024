@@ -26,7 +26,8 @@ document.addEventListener('DOMContentLoaded', function() {
           } else {
             events.forEach(event => {
               const listItem = document.createElement('li');
-              listItem.textContent = `${event.title} at ${event.start_time}`;
+              const formattedDate = new Date(event.date).toLocaleDateString();
+              listItem.textContent = `${event.title} in ${event.location} at ${event.endtime} on ${formattedDate}`;
               upcomingEventsList.appendChild(listItem);
             });
           }
