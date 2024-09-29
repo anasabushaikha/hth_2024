@@ -7,7 +7,7 @@
   background-color: #f0f0f0;
   border-left: 4px solid;
   box-shadow: 0 1px 3px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24);
-  transition: all 0.3s cubic-bezier(.25,.8,.25,1), transform 0.5s ease-out;
+  transition: all 0.3s cubic-bezier(.25,.8,.25,1), transform 0.5s ease-out, opacity 0.5s ease-out;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -83,6 +83,8 @@
 }
 
 .timetable {
+  position: relative;
+  padding-top: 60px; /* Add padding to account for the shifted content */
   min-height: 400px; /* Adjust this value as needed */
 }
 
@@ -213,4 +215,78 @@
     transform: scale(0) rotate(10deg);
     opacity: 0;
   }
+}
+
+.time-column,
+.day-column {
+  padding-top: 60px; /* Add padding to align with the shifted grid */
+}
+
+.day-header {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 70px;
+  z-index: 2;
+  background-color: #87CEEB; /* Sky blue background */
+  color: #333;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-bottom: 2px solid #4682B4;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  transition: transform 0.3s ease; /* Changed from 'all' to only 'transform' */
+  border-radius: 0 0 15px 15px;
+}
+
+.day-header:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+  /* Removed the background-color change */
+}
+
+.day-tasks {
+  position: relative;
+}
+
+.task-item {
+  /* Existing styles */
+  top: calc(var(--top) + 60px); /* Adjust the top position to account for the shift */
+}
+
+@keyframes popIn {
+  0% {
+    transform: scale(0) translateY(50%);
+    opacity: 0;
+  }
+  70% {
+    transform: scale(1.1) translateY(-10%);
+    opacity: 0.7;
+  }
+  100% {
+    transform: scale(1) translateY(0);
+    opacity: 1;
+  }
+}
+
+.task-item.new-task {
+  animation: popIn 0.5s cubic-bezier(0.68, -0.55, 0.265, 1.55) forwards;
+}
+
+@keyframes fadeOut {
+  0% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  100% {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+}
+
+.task-item.deleting {
+  animation: fadeOut 0.5s ease-out forwards;
 }

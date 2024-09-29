@@ -1,5 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {useTaskStore, useFetchTasks} from '../store/product'
+import axios from 'axios'
 import './Timetable.css'
 
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
@@ -139,8 +140,10 @@ const TaskModal = ({ task, onClose, onDelete }) => {
   )
 }
 
-const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
-  const { tasks, deleteTask, updateTask } = useTaskStore()
+const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek, onAIInput }) => {
+  const { tasks, addTask, deleteTask, updateTask } = useTaskStore()
+  
+  // Add this console.log
   const [selectedTask, setSelectedTask] = useState(null)
 
   // TODO: use state & use effect
@@ -247,7 +250,10 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
       });
 
       // Update all affected tasks
-      updatedTasks.forEach(task => updateTask(task.id, task));
+      updatedTasks.forEach(task => {
+        console.log('Updating task:', task.id, task);
+        updateTask(task.id, task);
+      });
     }
   };
 
@@ -264,16 +270,15 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
     return date.toLocaleDateString('en-US', options);
   }
 
-
   const hourHeight = 60; // Height of each hour slot in pixels
   return (
     <div className="timetable">
       <button className="nav-button prev" onClick={goToPreviousWeek}>
         <span className="arrow-icon">&gt;</span>
       </button>
-      <div className="timetable-grid">
+      <div className="timetable-grid" style={{ paddingTop: '60px' }}> {/* Add padding to shift everything down */}
         <div className="time-column">
-          <div className="day-header"></div>
+          <div className="day-header" style={{ height: '60px' }}></div> {/* Increase height of day header */}
           {timeSlots.map((time) => (
             <div key={time} className="time-slot" style={{ height: `${hourHeight}px` }}>{time}</div>
           ))}
@@ -283,11 +288,11 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
           const formattedDate = date.toISOString().split('T')[0]
           return (
             <div key={formattedDate} className="day-column">
-              <div className="day-header">
+              <div className="day-header" style={{ height: '60px' }}> {/* Increase height of day header */}
                 <div className="day-name">{dayOfWeek}</div>
                 <div className="day-date">{formatDate(date)}</div>
               </div>
-              <div className="day-tasks" style={{ paddingTop: '60px' }}> {/* Add padding to shift tasks down */}
+              <div className="day-tasks">
                 {timeSlots.map((time) => (
                   <div
                     key={`${formattedDate}-${time}`}

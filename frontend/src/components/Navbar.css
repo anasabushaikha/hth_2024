@@ -98,6 +98,54 @@
   color: #FFD700; /* Changed to gold color on hover */
 }
 
+.ai-button {
+  background-color: #4CAF50;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.ai-button:hover {
+  background-color: #45a049;
+}
+
+.update-tasks-button {
+  background-color: #4a69bd;
+  border: none;
+  color: white;
+  padding: 10px 20px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+  margin: 4px 2px;
+  transition-duration: 0.4s;
+  cursor: pointer;
+  border-radius: 12px;
+}
+
+.update-tasks-button:hover {
+  background-color: #1e3799;
+}
+
+.delete-task-button {
+  /* Add any specific styles for the delete button here */
+  background-color: #ff6b6b;  /* A light red color */
+  color: white;
+}
+
+.delete-task-button:hover {
+  background-color: #ff4757;  /* A slightly darker red on hover */
+}
+
 @media screen and (max-width: 960px) {
   .navbar-container {
     padding: 0 30px;

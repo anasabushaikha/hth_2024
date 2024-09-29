@@ -22,63 +22,53 @@ const clientConfig = {
   password: 'postgres',
   port: 5432,
 };
-
-// Endpoint to handle event and habit insertion
-app.post('/insertEventsAndHabits', async (req, res) => {
+app.post('/insertEvents', async (req, res) => {
   const events = req.body.events;
-  const habits = req.body.habits; // Assume habits are sent in the same request
-
+ 
+ 
   const client = new Client(clientConfig);
-
+  console.log(res)
   try {
     await client.connect();
-
-    // Insert events into schedule_events table
+ 
+ 
     for (let event of events) {
       const query = `
-        INSERT INTO schedule_events (title, event_date, start_time, end_time, location, description, reminder, duration, focus, moveable)
-        VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10);
+        INSERT INTO events (title, day, start_time, end_time, location, description, reminder)
+        VALUES ($1, $2, $3, $4, $5, $6, $7);
       `;
       const values = [
-        event["title"],
-        event["date"],
-        event["starttime"],
-        event["endtime"],
-        event["location"] || 'None', // Default to 'None' if location is empty
+        event["title"],    // Consistent naming convention for event properties
+        event["day"],
+        event["start_time"],
+        event["end_time"],
+        event["location"],
         event["description"],
-        event["reminder"] || 5, // Default reminder to 5 if not specified
-        event["duration"],
-        event["focus"],
-        event["moveable"]
+        event["reminder"]
       ];
-
-      await client.query(query, values);
-      console.log(`Inserted event: ${event["title"]}`);
-    }
-
-    // Insert habits into user_habits table
-    if (habits && habits.length > 0) {
-      for (let habit of habits) {
-        const habitQuery = `
-          INSERT INTO user_habits (habit)
-          VALUES ($1);
-        `;
-        await client.query(habitQuery, [habit]);
-        console.log(`Inserted habit: ${habit}`);
+     
+      let acc = event;
+      console.log(acc)
+   
+      try {
+        await client.query(query, values); // Ensure to wrap in try-catch to handle potential errors
+        console.log(`Inserted event: ${event["title"]}`);
+      } catch (err) {
+        console.error(`Error inserting event: ${event["title"]}`, err);
       }
-    }
-
-    // After successfully inserting, generate a message
-    const message = 'Events and habits have been inserted successfully!';
-    res.json({ success: true, message });
+    } 
+    // After successfully inserting, generate speech
+    const message = 'You sexy beast! Events have been inserted successfully! Good job, sweetheart!';
+    res.json({ success: true });
   } catch (err) {
-    console.error('Error inserting events or habits:', err);
-    res.status(500).json({ success: false, message: 'Error inserting events or habits' });
+    console.error('Error inserting events:', err);
+    res.status(500).json({ success: false, message: 'Error inserting events' });
   } finally {
     await client.end();
   }
-});
-
+ });
+ 
+ 
 // Endpoint to fetch events
 app.get('/getEvents', async (req, res) => {
   const client = new Client(clientConfig);
@@ -136,6 +126,9 @@ app.post('/generateSpeech', async (req, res) => {
     res.status(500).send('Error generating speech');
   }
 });
+
+// Add this new endpoint to insert events
+
 
 // Start the server
 app.listen(port, () => {
