@@ -2,17 +2,21 @@ import React, { useState, useMemo, useEffect } from 'react'
 import {useTaskStore, useFetchTasks} from '../store/product'
 import './Timetable.css'
 
+
 const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']
+
 
 const TaskItem = ({ task, onDelete, onMove, timeRange, onClick, hourHeight }) => {
   const [isDeleting, setIsDeleting] = useState(false);
   const colors = ['#FFB3BA', '#BAFFC9', '#BAE1FF', '#FFFFBA', '#FFD1DC']
   const bgColor = colors[Math.floor(Math.random() * colors.length)]
 
+
   const [startHour, startMinute] = task.startTime.split(':').map(Number)
   const startMinutes = startHour * 60 + startMinute
   const taskStart = (startMinutes - timeRange.start * 60) / 60
   const taskHeight = task.duration / 60
+
 
   const formatTime = (time) => {
     const [hours, minutes] = time.split(':')
@@ -22,10 +26,13 @@ const TaskItem = ({ task, onDelete, onMove, timeRange, onClick, hourHeight }) =>
     return `${formattedHour}:${minutes} ${ampm}`
   }
 
+
   const minHeight = 24 // Minimum height to display the title
   const isShortTask = taskHeight * hourHeight < minHeight * 2 // Check if task is too short to display all info
 
+
   let clickTimer = null;
+
 
   const handleClick = () => {
     if (clickTimer === null) {
@@ -40,10 +47,12 @@ const TaskItem = ({ task, onDelete, onMove, timeRange, onClick, hourHeight }) =>
     }
   };
 
+
   const handleDoubleClick = () => {
     setIsDeleting(true);
     setTimeout(() => onDelete(task.id), 500); // Wait for animation to finish
   };
+
 
   return (
     <div
@@ -72,8 +81,10 @@ const TaskItem = ({ task, onDelete, onMove, timeRange, onClick, hourHeight }) =>
   )
 }
 
+
 const TaskModal = ({ task, onClose, onDelete }) => {
   const [isOpen, setIsOpen] = useState(false);
+
 
   useEffect(() => {
     if (task) {
@@ -84,9 +95,11 @@ const TaskModal = ({ task, onClose, onDelete }) => {
     }
   }, [task]);
 
+
   if (!task) {
     return null;
   }
+
 
   const formatDateTime = (dateString, timeString) => {
     const date = new Date(dateString);
@@ -95,22 +108,24 @@ const TaskModal = ({ task, onClose, onDelete }) => {
     const ampm = hours >= 12 ? 'PM' : 'AM';
     const formattedHours = hours % 12 || 12;
     const formattedTime = `${formattedHours}:${minutes} ${ampm}`;
-    
-    const options = { 
-      weekday: 'long', 
-      month: 'long', 
+   
+    const options = {
+      weekday: 'long',
+      month: 'long',
       day: 'numeric',
       year: date.getFullYear() !== currentYear ? 'numeric' : undefined
     };
-    
+   
     const formattedDate = date.toLocaleDateString('en-US', options);
     return `${formattedDate} at ${formattedTime}`;
   };
+
 
   const handleClose = () => {
     setIsOpen(false);
     setTimeout(onClose, 300); // Wait for the closing animation to finish
   };
+
 
   return (
     <div className={`task-modal-overlay ${isOpen ? 'open' : ''}`} onClick={handleClose}>
@@ -139,12 +154,15 @@ const TaskModal = ({ task, onClose, onDelete }) => {
   )
 }
 
+
 const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
   const { tasks, deleteTask, updateTask } = useTaskStore()
   const [selectedTask, setSelectedTask] = useState(null)
 
+
   // TODO: use state & use effect
   const x = useFetchTasks()
+
 
   const visibleDates = useMemo(() => {
     const dates = []
@@ -156,17 +174,19 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
     return dates
   }, [currentDate])
 
+
   const timeRange = useMemo(() => {
     const yesterday = new Date(visibleDates[0])
     yesterday.setDate(yesterday.getDate() - 1)
     const lastDay = new Date(visibleDates[6])
-    
+   
     const relevantTasks = tasks.filter(task => {
       const taskDate = new Date(task.date)
       return taskDate >= yesterday && taskDate <= lastDay
     })
-      
+     
     if (relevantTasks.length === 0) return { start: 0, end: 24 }
+
 
     let earliestTime = 24 * 60 // Convert to minutes
     let latestTime = 0
@@ -175,19 +195,22 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
       const taskStartMinutes = hours * 60 + minutes
       const taskEndMinutes = taskStartMinutes + task.duration
 
+
       earliestTime = Math.min(earliestTime, taskStartMinutes)
       latestTime = Math.max(latestTime, taskEndMinutes)
     })
 
+
     // Ensure a minimum range of 6 hours and round to the nearest hour
     const minRange = 6 * 60 // 6 hours in minutes
     const rangeInMinutes = Math.max(latestTime - earliestTime, minRange)
-    
+   
     return {
       start: Math.max(0, Math.floor(earliestTime / 60) - 1),
       end: Math.min(24, Math.ceil((earliestTime + rangeInMinutes) / 60) + 1)
     }
   }, [tasks, visibleDates])
+
 
   const timeSlots = useMemo(() => {
     return Array.from(
@@ -196,36 +219,41 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
     )
   }, [timeRange])
 
+
   const handleDelete = (taskId) => {
     deleteTask(taskId)
     setSelectedTask(null)
   }
 
+
   const handleMove = (e, targetDate, targetTime) => {
     e.preventDefault();
     const sourceTask = JSON.parse(e.dataTransfer.getData('text/plain'));
-    
+   
     // Adjust the target time by adding one hour (60 minutes)
     const [hours, minutes] = targetTime.split(':').map(Number);
     const adjustedTime = `${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
-    
+   
     if (sourceTask.date !== targetDate || sourceTask.startTime !== adjustedTime) {
       const updatedSourceTask = { ...sourceTask, date: targetDate, startTime: adjustedTime };
-      
+     
       // Calculate the end time of the moved task
       const sourceEndTime = new Date(`2000-01-01T${adjustedTime}`);
       sourceEndTime.setMinutes(sourceEndTime.getMinutes() + updatedSourceTask.duration);
       const sourceEndTimeString = sourceEndTime.toTimeString().slice(0, 5);
 
+
       // Find tasks that might need to be moved
-      const tasksToCheck = tasks.filter(task => 
-        task.date === targetDate && 
+      const tasksToCheck = tasks.filter(task =>
+        task.date === targetDate &&
         task.id !== sourceTask.id &&
         task.startTime >= adjustedTime
       ).sort((a, b) => a.startTime.localeCompare(b.startTime));
 
+
       const updatedTasks = [updatedSourceTask];
       let currentEndTime = sourceEndTime;
+
 
       tasksToCheck.forEach(task => {
         const taskStartTime = new Date(`2000-01-01T${task.startTime}`);
@@ -234,6 +262,7 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
           const newStartTime = currentEndTime.toTimeString().slice(0, 5);
           const updatedTask = { ...task, startTime: newStartTime };
           updatedTasks.push(updatedTask);
+
 
           // Update currentEndTime for the next iteration
           currentEndTime = new Date(`2000-01-01T${newStartTime}`);
@@ -246,23 +275,28 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
         }
       });
 
+
       // Update all affected tasks
       updatedTasks.forEach(task => updateTask(task.id, task));
     }
   };
 
+
   const handleTaskClick = (task) => {
     setSelectedTask(task)
   }
 
+
   const formatDate = (date) => {
-    const options = { 
-      month: 'short', 
+    const options = {
+      month: 'short',
       day: 'numeric',
       year: date.getFullYear() !== new Date().getFullYear() ? 'numeric' : undefined
     };
     return date.toLocaleDateString('en-US', options);
   }
+
+
 
 
   const hourHeight = 60; // Height of each hour slot in pixels
@@ -328,5 +362,6 @@ const Timetable = ({ currentDate, goToPreviousWeek, goToNextWeek }) => {
     </div>
   )
 }
+
 
 export default Timetable
