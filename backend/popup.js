@@ -2,6 +2,50 @@ document.addEventListener('DOMContentLoaded', function() {
   const output = document.getElementById('output');
   let recognition;
   let wakeWordRecognition;
+  const upcomingEventsList = document.getElementById('upcomingEventsList');
+
+  // Function to fetch and display upcoming events
+  function fetchAndDisplayUpcomingEvents() {
+    fetch('http://localhost:3000/upcomingEvents')  // Correct endpoint
+      .then(response => {
+        console.log('Response:', response);  // Log the response
+        if (!response.ok) {
+          throw new Error('Network response was not ok');
+        }
+        return response.json();
+      })
+      .then(data => {
+        console.log('Data:', data);  // Log the data
+        upcomingEventsList.innerHTML = ''; // Clear the list
+
+        if (data.success) {
+          const events = data.events;
+
+          if (events.length === 0) {
+            upcomingEventsList.innerHTML = '<li>No upcoming events.</li>';
+          } else {
+            events.forEach(event => {
+              const listItem = document.createElement('li');
+              listItem.textContent = `${event.title} at ${event.start_time}`;
+              upcomingEventsList.appendChild(listItem);
+            });
+          }
+        } else {
+          console.error('Error fetching upcoming events:', data.message);
+          upcomingEventsList.innerHTML = '<li>Error fetching upcoming events.</li>';
+        }
+      })
+      .catch(error => {
+        console.error('Error fetching upcoming events:', error);
+        upcomingEventsList.innerHTML = '<li>Error fetching upcoming events.</li>';
+      });
+  }
+
+  // Call the function to fetch and display upcoming events
+  fetchAndDisplayUpcomingEvents();
+
+
+  
 
   // Function to start the main recognition process
   function startMainRecognition() {
