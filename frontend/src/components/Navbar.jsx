@@ -6,6 +6,7 @@ import './Navbar.css';
 import axios from 'axios';
 
 const Navbar = () => {
+  console.log()
   const [acc, setAcc] = useState(null);
 
   useEffect(() => {
@@ -13,8 +14,9 @@ const Navbar = () => {
     const fetchAcc = async () => {
       try {
         const response = await axios.get('http://localhost:3000/getAcc');
+        console.log("This the actual response",response)
         if (response.data.success) {
-          setAcc(response.data.acc);
+          setAcc(response.data.events['action']);
           triggerGlobalAIHandler(response.data.acc);
         } else {
           console.error(response.data.message);

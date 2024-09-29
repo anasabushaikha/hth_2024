@@ -51,7 +51,7 @@ export const useFetchTasks = () => {
   useEffect(() => {
     const fetchTasks = async () => {
       try {
-        const response = await axios.get('http://localhost:3000/getEvents');
+        //const response = await axios.get('http://localhost:3000/getEvents');
        
         const fetchedEvents = response.data.map((event) => ({
           id: event.id,

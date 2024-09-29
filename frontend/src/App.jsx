@@ -1,4 +1,4 @@
-import React, { useState, useCallback } from 'react'
+import React, { useState, useCallback, useEffect } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import Navbar from './components/Navbar'
 import Timetable from './components/Timetable'
@@ -7,6 +7,8 @@ import CloudDecoration from './components/CloudDecoration'
 import { useTaskStore } from './store/product'
 import './App.css'
 import { setGlobalAIHandler } from './utils/globalFunctions';
+import axios from 'axios'
+
 
 function App() {
   const [currentDate, setCurrentDate] = useState(() => {
@@ -33,7 +35,44 @@ function App() {
     })
   }
 
+  useEffect(() => {
+    const fetchEvents = async () => {
+      try {
+        const response = await axios.get('http://localhost:3000/getAcc');
+        console.log("Actual",response)
+        handleAIInput(response);
+        if (response.data.success && response.data.events) {
+          // Add the events to the task store
+          response.data.events.forEach(event => {
+            const newTask = {
+              id: event.id,
+              title: event.title,
+              date: event.date,
+              startTime: event.starttime,
+              duration: parseInt(event.duration),
+              description: event.description,
+              location: event.location,
+              reminder: event.reminder,
+              focus: event.focus === 'true',
+              moveable: event.moveable === 'true'
+            };
+            addTask(newTask);
+          });
+          console.log('Fetched events and added to store:', response.data.events);
+        } else {
+          console.log('No events found');
+        }
+      } catch (error) {
+        console.error('Error fetching events:', error);
+      }
+    };
+
+    fetchEvents();
+  }, [addTask]);
+
+
   const handleAIInput = useCallback((aiInput) => {
+    console.log("THIS IS AI INPUT", aiInput)
     aiInput.forEach(item => {
       if (item.action === "add") {
         const newTask = {

@@ -5,6 +5,7 @@ export const setGlobalAIHandler = (handler) => {
 };
 
 export const triggerGlobalAIHandler = (action) => {
+  console.log(action)
   if (globalAIHandler) {
     console.log(`Global AI Handler called with action: ${action}`);
     globalAIHandler(action);

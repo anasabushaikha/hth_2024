@@ -145,7 +145,7 @@ document.addEventListener('DOMContentLoaded', function() {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': 'Bearer sk-kMIYGgbTYgHBsSkkRgqas0VLnQf13q-gV6M9vaAG20T3BlbkFJyAwM7arF-usCc18Lihg0yhE_kBwbFfUfJMgMXdvI0A'
+          'Authorization': 'Bearer sk-UHlUVdoNU9zPv4QxtEbNnt11vF0dQ97hEsJY_dkRTnT3BlbkFJ1cfU9682oaC5SPkHZRT6FsHSA8dhOomA9TSodjaTUA'
         },
         body: JSON.stringify({
           model: 'gpt-4o',
@@ -210,6 +210,7 @@ document.addEventListener('DOMContentLoaded', function() {
       .catch(error => {
         console.error('Fetch Error:', error);
         output.textContent = 'Error communicating with the AI service.';
+        output.textContent = error;
       });
     });
   }
@@ -278,7 +279,7 @@ document.addEventListener('DOMContentLoaded', function() {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': `Bearer sk-kMIYGgbTYgHBsSkkRgqas0VLnQf13q-gV6M9vaAG20T3BlbkFJyAwM7arF-usCc18Lihg0yhE_kBwbFfUfJMgMXdvI0A`
+        'Authorization': `Bearer sk-UHlUVdoNU9zPv4QxtEbNnt11vF0dQ97hEsJY_dkRTnT3BlbkFJ1cfU9682oaC5SPkHZRT6FsHSA8dhOomA9TSodjaTUA`
       },
       body: JSON.stringify({
         model: 'gpt-4', // Ensure correct model is used

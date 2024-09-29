@@ -35,30 +35,31 @@ app.post('/insertEvents', async (req, res) => {
 
 // Create a new API route to expose the acc value
 app.get('/getAcc', (req, res) => {
-  if (acc) {
-    res.json({ success: true,  events});
+  console.log("Checking",events)
+  if (events) {
+    res.json({ success: true, events });
   } else {
-    res.json({ success: false, message: 'No acc value found' });
+    res.json({ success: false, message: 'No events found' });
   }
 });
+
 
 
 // Endpoint to fetch events
-app.get('/getEvents', async (req, res) => {
-  const client = new Client(clientConfig);
+// app.get('/getEvents', async (req, res) => {
 
-  try {
-    await client.connect();
-    const query = 'SELECT * FROM events;';
-    const result = await client.query(query);
-    res.json(result.rows); // Send the rows as JSON
-  } catch (err) {
-    console.error('Error fetching events:', err);
-    res.status(500).json({ success: false, message: 'Error fetching events' });
-  } finally {
-    await client.end();
-  }
-});
+//   try {
+//     // await client.connect();
+//     // const query = 'SELECT * FROM events;';
+//     // const result = await client.query(query);
+//     res.json(result.rows); // Send the rows as JSON
+//   } catch (err) {
+//     console.error('Error fetching events:', err);
+//     res.status(500).json({ success: false, message: 'Error fetching events' });
+//   } finally {
+//     // await client.end();
+//   }
+// });
 
 // Endpoint to generate speech using OpenAI's TTS
 app.post('/generateSpeech', async (req, res) => {
@@ -70,7 +71,7 @@ app.post('/generateSpeech', async (req, res) => {
       method: 'POST',
       url: 'https://api.openai.com/v1/audio/speech',
       headers: {
-        'Authorization': `Bearer sk-kMIYGgbTYgHBsSkkRgqas0VLnQf13q-gV6M9vaAG20T3BlbkFJyAwM7arF-usCc18Lihg0yhE_kBwbFfUfJMgMXdvI0A`,
+        'Authorization': `Bearer sk-UHlUVdoNU9zPv4QxtEbNnt11vF0dQ97hEsJY_dkRTnT3BlbkFJ1cfU9682oaC5SPkHZRT6FsHSA8dhOomA9TSodjaTUA`,
         'Content-Type': 'application/json'
       },
       data: {
@@ -104,17 +105,17 @@ app.post('/generateSpeech', async (req, res) => {
 // Get events endpoint
 app.get('/events', async (req, res) => {
   // Define the client inside the route handler
-  const client = new Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'hth-project',
-    password: 'postgres',
-    port: 5432,
-  });
+  // const client = new Client({
+  //   user: 'postgres',
+  //   host: 'localhost',
+  //   database: 'hth-project',
+  //   password: 'postgres',
+  //   port: 5432,
+  // });
 
   try {
-    await client.connect();
-    const result = await client.query('SELECT * FROM events');
+    // await client.connect();
+    // const result = await client.query('SELECT * FROM events');
     res.json({
       success: true,
       data: result.rows,
@@ -126,7 +127,7 @@ app.get('/events', async (req, res) => {
       message: 'Error retrieving events',
     });
   } finally {
-    await client.end();
+    // await client.end();
   }
 });
 
@@ -136,31 +137,31 @@ app.delete('/deleteEvent/:id', async (req, res) => {
   const eventId = req.params.id;
 
   try {
-    await client.connect();
-    const query = 'DELETE FROM events WHERE id = $1';
-    await client.query(query, [eventId]);
+    // await client.connect();
+    // const query = 'DELETE FROM events WHERE id = $1';
+    // await client.query(query, [eventId]);
     res.json({ success: true });
   } catch (err) {
     console.error('Error deleting event:', err);
     res.status(500).json({ success: false, message: 'Error deleting event' });
   } finally {
-    await client.end();
+    // await client.end();
   }
 });
 
 // Endpoint to fetch upcoming events
 app.get('/upcomingEvents', async (req, res) => {
-  const client = new Client(clientConfig);
+  // const client = new Client(clientConfig);
 
   try {
-    await client.connect();
+    // await client.connect();
     // SQL query to fetch upcoming events based on current date and time
-    const result = await client.query(`
-      SELECT * FROM public.events
-      WHERE (date > CURRENT_DATE)
-      OR (date = CURRENT_DATE AND endtime > CURRENT_TIME)
-      ORDER BY date, starttime;
-    `);
+    // const result = await client.query(`
+    //   SELECT * FROM public.events
+    //   WHERE (date > CURRENT_DATE)
+    //   OR (date = CURRENT_DATE AND endtime > CURRENT_TIME)
+    //   ORDER BY date, starttime;
+    // `);
 
     // Send result as JSON
     res.json({
@@ -174,7 +175,7 @@ app.get('/upcomingEvents', async (req, res) => {
       message: 'Error fetching upcoming events',
     });
   } finally {
-    await client.end();
+    // await client.end();
   }
 });
 
