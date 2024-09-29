@@ -3,6 +3,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
   const startButton = document.getElementById('startListening');
   const output = document.getElementById('output');
+  const taskList = document.getElementById('taskList');
   let recognition;
   let wakeWordRecognition;
 
@@ -26,7 +27,7 @@ document.addEventListener('DOMContentLoaded', function() {
 
         // Check for the test command
         if (spokenText.toLowerCase() === 'test reminder') {
-          insertTestEvent();
+          insertTestEvent(); // Assuming insertTestEvent is defined elsewhere
         } else {
           // Pass the spoken text directly to ChatGPT
           processCommand(spokenText);
@@ -94,6 +95,8 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
 
+      console.log('API Key retrieved:', apiKey); // Log API key retrieval
+
       fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
         headers: {
@@ -120,8 +123,12 @@ document.addEventListener('DOMContentLoaded', function() {
         
         
       })
-      .then(response => response.json())
+      .then(response => {
+        console.log('API response status:', response.status); // Log response status
+        return response.json();
+      })
       .then(data => {
+        console.log('API response data:', data); // Log response data
         if (data.error) {
           console.error('OpenAI API Error:', data.error);
           output.textContent = 'Error processing the command.';
@@ -175,12 +182,23 @@ document.addEventListener('DOMContentLoaded', function() {
       },
       body: JSON.stringify({ events }),  // Send the events data to the backend
     })
-    .then(response => response.json())
+    .then(response => {
+      if (!response.ok) {
+        throw new Error('Network response was not ok');
+      }
+      return response.json();
+    })
     .then(data => {
+      console.log('Backend response:', data);  // Log the response from backend
       if (data.success) {
         output.textContent = 'Events inserted successfully!';
         // fetchChatGPTResponse('success');  // Get a success phrase from ChatGPT
+        // Schedule reminders for the events (assuming scheduleReminders is defined elsewhere)
+        scheduleReminders(events);
+        fetchAndDisplayTasks(); // Refresh the task list
       } else {
+        console.error('Backend Error:', data.message);
+        output.textContent = 'Error inserting events: ' + data.message;
         output.textContent = error;
         // fetchChatGPTResponse('failure');  // Get a failure phrase from ChatGPT
       }

@@ -137,6 +137,53 @@ app.post('/generateSpeech', async (req, res) => {
   }
 });
 
+// Get events endpoint
+app.get('/events', async (req, res) => {
+  // Define the client inside the route handler
+  const client = new Client({
+    user: 'postgres',
+    host: 'localhost',
+    database: 'hth-project',
+    password: 'postgres',
+    port: 5432,
+  });
+
+  try {
+    await client.connect();
+    const result = await client.query('SELECT * FROM events');
+    res.json({
+      success: true,
+      data: result.rows,
+    });
+  } catch (err) {
+    console.error('Error retrieving events:', err);
+    res.status(500).json({
+      success: false,
+      message: 'Error retrieving events',
+    });
+  } finally {
+    await client.end();
+  }
+});
+
+
+// DELETE to handle event deletion
+app.delete('/deleteEvent/:id', async (req, res) => {
+  const eventId = req.params.id;
+
+  try {
+    await client.connect();
+    const query = 'DELETE FROM events WHERE id = $1';
+    await client.query(query, [eventId]);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Error deleting event:', err);
+    res.status(500).json({ success: false, message: 'Error deleting event' });
+  } finally {
+    await client.end();
+  }
+});
+
 // Start the server
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
