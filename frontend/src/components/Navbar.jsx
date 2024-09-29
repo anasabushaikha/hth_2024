@@ -1,7 +1,6 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useTaskStore } from '../store/product';  // Import useTaskStore
-import { useTaskStore } from '../store/product';  // Import useTaskStore
 import './Navbar.css';
 
 const Navbar = ({ handleAIInput }) => {

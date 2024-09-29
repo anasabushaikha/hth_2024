@@ -1,7 +1,6 @@
 import React, { useState, useMemo, useEffect } from 'react'
 import {useTaskStore, useFetchTasks} from '../store/product'
 import axios from 'axios'
-import axios from 'axios'
 import './Timetable.css'
 
 
