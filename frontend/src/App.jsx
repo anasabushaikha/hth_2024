@@ -37,7 +37,7 @@ function App() {
     aiInput.forEach(item => {
       if (item.action === "add") {
         const newTask = {
-          id: Date.now().toString(),
+          id: "1",
           title: item.event.title,
           date: item.event.date,
           startTime: item.event.starttime,

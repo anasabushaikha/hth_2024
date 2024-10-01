@@ -6,14 +6,13 @@ import axios from 'axios';
 const generateId = () => Math.random().toString(36).substr(2, 9);
 
 export const useTaskStore = create((set) => {
-  console.log('Initializing useTaskStore');
   return {
     tasks: [],
     setTasks: (tasks) => {
       set({ tasks });
     },
     addTask: (newTask) => {
-      const taskWithId = { ...newTask, id: generateId() };
+      const taskWithId = { ...newTask, id: "1" };
       set((state) => {
         const newTasks = [...state.tasks, taskWithId];
         return { tasks: newTasks };
@@ -22,7 +21,7 @@ export const useTaskStore = create((set) => {
     },
     deleteTask: (taskId) => {
       set((state) => {
-        const newTasks = state.tasks.filter((task) => task.id != taskId);
+        const newTasks = state.tasks.filter((task) => task.id != "1");
         return { tasks: newTasks };
       });
       return { success: true, message: 'Task deleted successfully' };

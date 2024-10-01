@@ -1,82 +1,59 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useTaskStore } from '../store/product';
 import { triggerGlobalAIHandler } from '../utils/globalFunctions';
 import './Navbar.css';
-import axios from 'axios';
 
 const Navbar = () => {
-  const [acc, setAcc] = useState(null);
+  const { deleteTask } = useTaskStore();
+  const [clickCount, setClickCount] = useState(0);
 
-  useEffect(() => {
-    // Fetch the acc value from the server
-    const fetchAcc = async () => {
-      try {
-        const response = await axios.get('http://localhost:3000/getAcc');
-        if (response.data.success) {
-          setAcc(response.data.acc);
-          triggerGlobalAIHandler(response.data.acc);
-        } else {
-          console.error(response.data.message);
-        }
-      } catch (error) {
-        console.error('Error fetching acc:', error);
-      }
+  const handleSubmit = () => {
+    const newClickCount = (clickCount + 2) % 3;
+    setClickCount(newClickCount);
+
+    const baseTask = {
+      id: "1",
+      title: "Drive Dad to the airport",
+      starttime: "15:00",
+      endtime: "5:00",
+      location: "airport",
+      description: "Driving Dad to the airport",
+      reminder: "15",
+      duration: "120",
+      focus: "true",
+      moveable: "true"
     };
 
-    fetchAcc();
-  }, []);
-
-  const { deleteTask } = useTaskStore();
-
-  const handleAIButtonClick = () => {
-    const exampleAIInput = [
-      {
-        action: "add",
-        event: {
-          id: "1",
-          title: "AI Generated Task",
-          starttime: "08:00",
-          endtime: "15:00",
-          location: "Virtual",
-          description: "This is an AI generated task",
-          reminder: "15",
-          date: new Date().toISOString().split('T')[0],
-          duration: "60",
-          focus: "true",
-          moveable: "true"
-        }
-      }
-    ];
-    triggerGlobalAIHandler(exampleAIInput);
-  };
-
-  const handleUpdateTasks = () => {
-    console.log('Updating tasks...');
-    const exampleAIInput = [
-      {
-        action: "update",
-        event: {
-          id: "1",
-          title: "HIHIHI",
-          starttime: "12:00",
-          endtime: "15:00",
-          location: "Virtual",
-          description: "This is an AI generated task",
-          reminder: "15",
-          date: new Date().toISOString().split('T')[0],
-          duration: "60",
-          focus: "true",
-          moveable: "true"
-        }
-      }
-    ];
-    triggerGlobalAIHandler(exampleAIInput);
-  };
-
-  const handleDeleteTask1 = () => {
-    triggerGlobalAIHandler([{ action: "delete", event: { id: "1" } }]);
-    console.log('Deleted task with id 1');
+    switch (newClickCount) {
+      case 2: // Add task
+        triggerGlobalAIHandler([{
+          action: "add",
+          event: { ...baseTask, date: "2024-09-29" }
+        }]);
+        console.log('Task added');
+        break;
+      case 1: // Update task
+        console.log("SDFFFFFFFFFFFF")
+        triggerGlobalAIHandler([{
+          action: "delete",
+          event: { id: "99" }
+        }]);
+        triggerGlobalAIHandler([{
+          action: "add",
+          event: { ...baseTask, date: "2024-09-30" }
+        }]);
+        console.log('Task updated', {...baseTask, date: "2024-09-30"});
+       
+        break;
+      case 0: // Delete task
+        triggerGlobalAIHandler([{
+          action: "delete",
+          event: { id: "99" }
+        }]);
+        console.log('Task deleted');
+        break;
+    }
   };
 
   return (
@@ -100,21 +77,9 @@ const Navbar = () => {
             </Link>
           </li>
           <li className="navbar-item">
-            <button onClick={handleAIButtonClick} className="navbar-link ai-button">
-              <span className="icon">🤖</span>
-              Generate AI Task
-            </button>
-          </li>
-          <li className="navbar-item">
-            <button onClick={handleUpdateTasks} className="navbar-link update-tasks-button">
-              <span className="icon">🔄</span>
-              Update Tasks
-            </button>
-          </li>
-          <li className="navbar-item">
-            <button onClick={handleDeleteTask1} className="navbar-link delete-task-button">
-              <span className="icon">🗑️</span>
-              Delete Task 1
+            <button onClick={handleSubmit} className="navbar-link submit-button">
+              <span className="icon">📝</span>
+              Submit
             </button>
           </li>
         </ul>

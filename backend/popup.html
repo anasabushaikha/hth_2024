@@ -1,209 +1,224 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Time Table Sweetheart</title>
-  <script src="popup.js"></script>
-  <style>
-    body {
-      font-family: 'Arial', sans-serif;
-      width: 320px;
-      margin: 0;
-      padding: 0;
-      background-color: #f0f4f8;
-      color: #333;
-      transition: background-color 0.3s ease;
-      border-radius: 15px;
-    }
-    .container {
-      padding: 20px;
-      background-color: #ffffff;
-      border-radius: 15px;
-      overflow: hidden;
-    }
-    #taskList { margin-top: 20px; }
-    .task { 
-      padding: 10px; 
-      margin-bottom: 10px; 
-      border-radius: 10px; 
-      background-color: #ffffff;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1); 
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    h1 {
-      text-align: center;
-      color: #34495e;
-      margin-bottom: 20px;
-      font-size: 24px;
-      animation: slideIn 1s ease-in-out;
-    }
-    #profileImage {
-      display: block;
-      margin: 0 auto 20px auto;
-      width: 200px;
-      height: 200px;
-      border-radius: 50%;
-      object-fit: cover;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    #profileImage:hover {
-      transform: scale(1.05);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    #startListening {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      background-color: #3498db;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-    }
-    #startListening:hover {
-      background-color: #2980b9;
-      transform: scale(1.05);
-    }
-    #output {
-      margin-top: 15px;
-      padding: 10px;
-      background-color: #ecf0f1;
-      border-radius: 5px;
-      font-style: italic;
-      text-align: center;
-      animation: fadeIn 1s ease-in-out;
-    }
-    h2 {
-      margin-top: 20px;
-      color: #34495e;
-      font-size: 18px;
-      animation: slideIn 1s ease-in-out;
-    }
-    #taskList {
-      list-style-type: none;
-      padding: 0;
-    }
-    #taskList li {
-      background-color: #ffffff;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-    #taskList li:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-    @keyframes fadeIn {
-      from { opacity: 0; }
-      to { opacity: 1; }
-    }
-    @keyframes slideIn {
-      from { transform: translateX(-100%); opacity: 0; }
-      to { transform: translateX(0); opacity: 1; }
-    }
-    .fade-in {
-      animation: fadeIn 0.5s ease-in;
-    }
-    .slide-in {
-      animation: slideIn 1s ease-in-out;
-    }
-    a {
-      display: block;
-      text-align: center;
-      margin-top: 20px;
-      color: #3498db;
-      text-decoration: none;
-      font-size: 16px;
-      transition: color 0.3s ease;
-    }
-    a:hover {
-      color: #2980b9;
-    }
-    #blockYouTubeAndCloseTabs {
-      display: block;
-      width: 100%;
-      padding: 10px;
-      background-color: #e74c3c;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      font-size: 16px;
-      cursor: pointer;
-      transition: background-color 0.3s ease, transform 0.2s ease;
-      margin-top: 20px;
-    }
-    #blockYouTubeAndCloseTabs:hover {
-      background-color: #c0392b;
-      transform: scale(1.05);
-    }
-    #upcomingEventsList {
-      list-style-type: none;
-      padding: 0;
-      margin-top: 20px;
-    }
-
-    #upcomingEventsList li {
-      background-color: #ffffff;
-      margin-bottom: 10px;
-      padding: 10px;
-      border-radius: 10px;
-      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-      transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-    #upcomingEventsList li:hover {
-      transform: translateY(-2px);
-      box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-    }
-<<<<<<< HEAD
-    @keyframes pulse {
-      0% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0.7); }
-      70% { box-shadow: 0 0 0 10px rgba(52, 152, 219, 0); }
-      100% { box-shadow: 0 0 0 0 rgba(52, 152, 219, 0); }
-    }
-
-    #profileImage.talking {
-      animation: pulse 1.5s infinite;
-    }
-=======
-
-     .event-actions {                  /*green checkmark box and red cross box */
-      display: flex;
-      justify-content: space-between;
-      margin-top: 10px;
-    }
-    .event-actions button {
-      border: none;
-      background: none;
-      cursor: pointer;
-      font-size: 20px;
-    }
-    .event-actions .checkmark {
-      color: green;
-    }
-    .event-actions .cross {
-      color: red;
-    }
-
->>>>>>> 47c5f978832d29a82142db3a537286ea1c0ff098
-  </style>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>Time Table Sweetheart</title>
+ <script src="popup.js"></script>
+ <style>
+   body {
+     font-family: 'Arial', sans-serif;
+     width: 320px;
+     margin: 0;
+     padding: 0;
+     background-color: #f0f4f8;
+     color: #333;
+     transition: background-color 0.3s ease;
+     border-radius: 15px;
+   }
+   .container {
+     padding: 20px;
+     background-color: #ffffff;
+     border-radius: 15px;
+     overflow: hidden;
+   }
+   #taskList { margin-top: 20px; }
+   .task {
+     padding: 10px;
+     margin-bottom: 10px;
+     border-radius: 10px;
+     background-color: #ffffff;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+     transition: transform 0.2s ease, box-shadow 0.2s ease;
+   }
+   h1 {
+     text-align: center;
+     color: #34495e;
+     margin-bottom: 20px;
+     font-size: 24px;
+     animation: slideIn 1s ease-in-out;
+   }
+   #profileImage {
+     display: block;
+     margin: 0 auto 20px auto;
+     width: 200px;
+     height: 200px;
+     border-radius: 50%;
+     object-fit: cover;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+     transition: transform 0.2s ease, box-shadow 0.2s ease;
+   }
+   #profileImage:hover {
+     transform: scale(1.05);
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   }
+   #startListening {
+     display: block;
+     width: 100%;
+     padding: 10px;
+     background-color: #3498db;
+     color: white;
+     border: none;
+     border-radius: 5px;
+     font-size: 16px;
+     cursor: pointer;
+     transition: background-color 0.3s ease, transform 0.2s ease;
+   }
+   #startListening:hover {
+     background-color: #2980b9;
+     transform: scale(1.05);
+   }
+   #output {
+     margin-top: 15px;
+     padding: 10px;
+     background-color: #ecf0f1;
+     border-radius: 5px;
+     font-style: italic;
+     text-align: center;
+     animation: fadeIn 1s ease-in-out;
+   }
+   h2 {
+     margin-top: 20px;
+     color: #34495e;
+     font-size: 18px;
+     animation: slideIn 1s ease-in-out;
+   }
+   #taskList {
+     list-style-type: none;
+     padding: 0;
+   }
+   #taskList li {
+     background-color: #ffffff;
+     margin-bottom: 10px;
+     padding: 10px;
+     border-radius: 10px;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+     transition: transform 0.2s ease, box-shadow 0.2s ease;
+   }
+   #taskList li:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   }
+   @keyframes fadeIn {
+     from { opacity: 0; }
+     to { opacity: 1; }
+   }
+   @keyframes slideIn {
+     from { transform: translateX(-100%); opacity: 0; }
+     to { transform: translateX(0); opacity: 1; }
+   }
+   .fade-in {
+     animation: fadeIn 0.5s ease-in;
+   }
+   .slide-in {
+     animation: slideIn 1s ease-in-out;
+   }
+   a {
+     display: block;
+     text-align: center;
+     margin-top: 20px;
+     color: #3498db;
+     text-decoration: none;
+     font-size: 16px;
+     transition: color 0.3s ease;
+   }
+   a:hover {
+     color: #2980b9;
+   }
+   #blockYouTubeAndCloseTabs {
+     display: block;
+     width: 100%;
+     padding: 10px;
+     background-color: #e74c3c;
+     color: white;
+     border: none;
+     border-radius: 5px;
+     font-size: 16px;
+     cursor: pointer;
+     transition: background-color 0.3s ease, transform 0.2s ease;
+     margin-top: 20px;
+   }
+   #blockYouTubeAndCloseTabs:hover {
+     background-color: #c0392b;
+     transform: scale(1.05);
+   }
+   #upcomingEventsList {
+     list-style-type: none;
+     padding: 0;
+     margin-top: 20px;
+   }
+   #upcomingEventsList li {
+     background-color: #ffffff;
+     margin-bottom: 10px;
+     padding: 10px;
+     border-radius: 10px;
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+     transition: transform 0.2s ease, box-shadow 0.2s ease;
+   }
+   #upcomingEventsList li:hover {
+     transform: translateY(-2px);
+     box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+   }
+   .event-actions {
+     display: flex;
+     gap: 15px;
+     margin-top: 10px;
+   }
+   .event-actions button {
+     background-color: #ecf0f1;
+     border: none;
+     border-radius: 5px;
+     padding: 5px 10px;
+     cursor: pointer;
+     transition: background-color 0.3s ease, transform 0.2s ease;
+     font-size: 16px;
+   }
+   .event-actions button:hover {
+     background-color: #bdc3c7;
+     transform: scale(1.1);
+   }
+   .event-actions button#tickMark {
+     color: #0bb45a;
+   }
+   .event-actions button#crossMark {
+     color: #e74c3c;
+   }
+   #loveMeterContainer {
+     text-align: center;
+     margin: 20px 0;
+   }
+   #loveMeter {
+     width: 100%;
+     height: 20px;
+     border-radius: 10px;
+     background: linear-gradient(to right, #e74c3c, #f39c12, #d536cd);
+     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+     transition: width 0.3s ease;
+   }
+   #loveMeter::-webkit-progress-bar {
+     background-color: #ecf0f1;
+     border-radius: 10px;
+   }
+   #loveMeter::-webkit-progress-value {
+     border-radius: 10px;
+   }
+ </style>
 </head>
 <body>
-  <div class="container">
-    <img id="profileImage" src="mom.webp" alt="Profile Image">
-    <a href="options.html">OpenAi</a>
-    <div id="output" class="fade-in"></div>
-  <h2 class="fade-in">Upcoming Events:</h2>
-  <ul id="upcomingEventsList" class="fade-in"></ul>
-  <button id="blockYouTubeAndCloseTabs" class="fade-in">BLOCK DISTRACTIONS &#x1F6AB;</button>
-  </div>
-  <script src="backend/punishment.js"></script>
-  <script src="backend/popup.js"></script>
+ <div class="container">
+   <img id="profileImage" src="mom.webp" alt="Profile Image">
+   <div id="loveMeterContainer">
+     <label for="loveMeter">Love Meter:</label>
+     <progress id="loveMeter" value="50" max="100"></progress>
+   </div>
+   <a href="options.html">Say Hey Sweetie!</a>
+   <div id="output" class="fade-in"></div>
+   <h2 class="fade-in">Upcoming Events:</h2>
+   <ul id="upcomingEventsList" class="fade-in"></ul>
+   <button id="blockYouTubeAndCloseTabs" class="fade-in">BLOCK DISTRACTIONS &#x1F6AB;</button>
+ </div>
 </body>
 </html>
+
+
+
