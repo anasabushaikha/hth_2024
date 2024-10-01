@@ -174,7 +174,7 @@ function processCommand(command) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        'Authorization': 'Bearer sk-j1FWLZYG2O2QOZBzy-vp2RSxuEAEdpopi9DEKAgVtiT3BlbkFJnW6T6_jc-n9R8O2uRX5oSNJgOmeuNkR_dnvTgWBO8A'
+        'Authorization': ''//'Bearer sk-j1FWLZYG2O2QOZBzy-vp2RSxuEAEdpopi9DEKAgVtiT3BlbkFJnW6T6_jc-n9R8O2uRX5oSNJgOmeuNkR_dnvTgWBO8A'
       },
       body: JSON.stringify({
         model: 'gpt-4o',
