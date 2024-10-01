@@ -174,7 +174,6 @@ function processCommand(command) {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        //'Authorization': `Bearer ${apiKey}`
       },
       body: JSON.stringify({
         model: 'gpt-4o',
@@ -309,7 +308,6 @@ function fetchChatGPTResponse(status) {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
-      //'Authorization': `Bearer ${apiKey}`
     },
     body: JSON.stringify({
       model: 'gpt-4', // Ensure correct model is used
