@@ -9,6 +9,10 @@ Our project is an intelligent AI companion designed to help users stay accountab
 
 The platform is equipped with a user-friendly interface, allowing users to interact in their preferred language and seamlessly manage their schedules. By intelligently analyzing user inputs, the AI optimizes daily events, finding the most productive and efficient way to complete tasks. It's more than just a scheduling assistant—it’s a personalized accountability partner that empowers users to achieve their best, both in productivity and personal growth.
 
+
+https://github.com/user-attachments/assets/10fd4200-0f49-44f7-beb0-5cd51affee02
+
+
 ## How we built it
 We integrated OpenAI's ChatGPT for voice recognition and interaction, allowing the AI to listen, respond, and guide users in real time. The voice assistant is seamlessly connected to a visually appealing, intuitive calendar interface, where users can easily manage their tasks and events.
 
